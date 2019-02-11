@@ -3,7 +3,6 @@ import java.awt.Font;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Random;
-
 import renderables.*;
 import dataStructures.RRTree;
 import easyGui.EasyGui;
@@ -17,13 +16,13 @@ public class PotentialFields {
 	//------------//
 	
 	private final EasyGui gui;
-        private  EasyGui newGUI  ; 
+    private  EasyGui newGUI  ; 
         
 	private final int buttonId;
-        private  int buttonIdNEW ;
-        private  int  x1newID ,   x2newID , x3newID, x4newID , x5newID;
-        private  int  y1newID ,   y2newID , y3newID, y4newID , y5newID;
-        private int  messageLabel ;  
+    private  int buttonIdNEW;
+    private  int  x1newID ,   x2newID , x3newID, x4newID , x5newID;
+    private  int  y1newID ,   y2newID , y3newID, y4newID , y5newID;
+    private int  messageLabel;
         
 	private final int circleSId;
 	private final int circleLId;
@@ -67,11 +66,11 @@ public class PotentialFields {
 	private ArrayList<Renderable> obstacles;
 
 	private boolean stop;
-	
-	//-------------//
-	// Constructor //
-	//-------------//
-	
+
+
+	/**
+	 * The aim of this constructor is to initialize the attributes.
+	 */
 	public PotentialFields() {
 		// Set up the GUI, labels, buttons
 		gui = new EasyGui(frameLength, frameHeight);
@@ -151,16 +150,16 @@ public class PotentialFields {
 
 		gui.addButton(7, 8, "Pause", this, "pause");
 		gui.addButton(6, 8, "Quit", this, "quit");
-		
 
-//		
+
 		obstacles = new ArrayList<Renderable>();
 	}
+
 
 	//---------//
 	// Methods //
 	//---------//
-	
+
 	// Control:
 	
 	public void runRobot() {
