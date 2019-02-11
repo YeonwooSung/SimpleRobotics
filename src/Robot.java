@@ -13,17 +13,17 @@ public class Robot {
 		gui.addButton(1, 1, "Potential Fields", this, "potentialFields");
 		
 	}
-	
+
 	public void runProject() {
 		gui.show();
 	}
-	
+
 	public void rrt() {
 		gui.hide();
 		RRT rt = new RRT();
 		rt.runRobot();
 	}
-	
+
 	public void potentialFields() {
 		gui.hide();
 		PotentialFields fields = new PotentialFields();
