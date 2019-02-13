@@ -16,14 +16,14 @@ public class PotentialFields {
 	//------------//
 	
 	private final EasyGui gui;
-    private  EasyGui newGUI  ; 
-        
+    private  EasyGui newGUI;
+
 	private final int buttonId;
-    private  int buttonIdNEW;
-    private  int  x1newID ,   x2newID , x3newID, x4newID , x5newID;
-    private  int  y1newID ,   y2newID , y3newID, y4newID , y5newID;
-    private int  messageLabel;
-        
+    private int buttonIdNEW;
+    private int x1newID, x2newID , x3newID, x4newID , x5newID;
+    private int y1newID, y2newID , y3newID, y4newID , y5newID;
+    private int messageLabel;
+
 	private final int circleSId;
 	private final int circleLId;
 	private final int squareSId;
@@ -33,8 +33,8 @@ public class PotentialFields {
 	private final int easyCourseId;
 	private final int medCourseId;
 	private final int hardCourseId;
-        private final int newobsticalShape;
-        
+    private final int newobsticalShape;
+
 	private final int enMikeId;
 	private final int disMikeId;
 	private final int enArcDrawingId;
