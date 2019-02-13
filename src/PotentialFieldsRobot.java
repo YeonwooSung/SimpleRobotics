@@ -209,20 +209,24 @@ public class PotentialFieldsRobot {
 	private double getHeadingChangeInterval(double theta, double arcLength) {
 		return stepSize * 2.0 * theta / arcLength;
 	}
-        /**********
-         * compute the Obstacle potential for point P  
-         * @return Obstacle potential 
-         */
-        private  double  getObstaclePotential ( IntPoint p  )
-        {
-            double[] obsDists = new double[visibleObstacles.size()];
+
+    /**
+     * compute the Obstacle potential for point P  
+     * @return Obstacle potential 
+     */
+    private  double  getObstaclePotential ( IntPoint p  ) {
+
+        double[] obsDists = new double[visibleObstacles.size()];
+
 		for (int i = 0; i < visibleObstacles.size(); i++) {
 			// Distance is set to 0 if it's closer than the radius to the obstacle
 			double distanceFromObstacle = distance(p, visibleObstacles.get(i)) - radius;
 			obsDists[i] = distanceFromObstacle <= 0 ? 0 : distanceFromObstacle / 100;
 		}
-                double obsField = 0;
-                for (int i = 0; i < visibleObstacles.size(); i++) {
+
+        double obsField = 0;
+
+        for (int i = 0; i < visibleObstacles.size(); i++) {
 			if (obsDists[i] <= 0) {
 				obsField = Double.MAX_VALUE;
 				break;
@@ -231,9 +235,10 @@ public class PotentialFieldsRobot {
 			}
 			obsField += Math.pow(Math.E, -1 / ((sensorRange) - obsDists[i])) / (obsDists[i]);
 		}
-               return   obsField  ;  
-                
-        }
+        return obsField;
+    }
+
+
 	/**
 	 * Get the potential field at point p. The lower the value returned, the better
 	 * the point is as a move.
@@ -241,8 +246,6 @@ public class PotentialFieldsRobot {
 	 * @param p the point to evaluate
 	 * @return The value of the point
 	 */
-        
-        
 	private double evalMoveArc(IntPoint p, IntPoint goal) {
 		ArcSet arcs = get3Arcs(p  ,false );
 		double goalDist = (arcs.firstArc.arcLength +arcs.secondArc.arcLength + arcs.thirdArc.arcLength - radius) / 100; // Everything is divided by 10 because otherwise the
@@ -255,9 +258,9 @@ public class PotentialFieldsRobot {
 		}
 		// Calculate field power - x^2 so value gets small as distance decreases
 		double goalField = Math.pow(goalDist, 2);
-                
-                
-                
+
+
+
 		// obsField power is sum of all obstacles, and gets v. large as distance
 		// decreases and vice versa
 		double obsField = 0;
@@ -270,13 +273,14 @@ public class PotentialFieldsRobot {
 			}
 			obsField += Math.pow(Math.E, -1 / ((sensorRange) - obsDists[i])) / (obsDists[i]);
 		}
-		
-		
+
+
 		double totalScore =10*goalField + Math.pow(2*radius,2)*4750*obsField / (sensorDensity*sensorRange);
-			
+
 		return totalScore;
 	}
-	
+
+
 	/**
 	 * Evaluate all of the robot's potential movement positions & return the best.
 	 * 
@@ -377,18 +381,23 @@ public class PotentialFieldsRobot {
 	 * @return The most valuable point
 	 */
 	private IntPoint evaluateSamplePoints() {
-		List<IntPoint> moves = getSamplePoints(); 
+		List<IntPoint> moves = getSamplePoints();
+
 		// If there's no moves that doesn't go through obstacles, quit
 		if (moves.isEmpty()) {
 			return null;
 		}
+
 		// Value of moves is a function of distance from goal & distance from detected objects
 		double[] moveValues = new double[moves.size()];
+
 		for (int i = 0; i < moves.size(); i++) {
 			moveValues[i] = evalMove(moves.get(i), this.goal);
 		}
+
 		return moves.get(minIndex(moveValues)); // Return the lowest valued move
 	}
+
 
 	/**
 	 * Evaluate all of the robot's potential movement positions & return the best.
@@ -771,7 +780,7 @@ public class PotentialFieldsRobot {
 			return robotPicAlt;
 		}
 	}
-	
+
 	public MyArc getFirstArc() { //TODO: null pointer exception moving between plannars halway
 		return firstArc;
 	}
