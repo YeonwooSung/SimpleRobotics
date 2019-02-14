@@ -1,1 +1,8 @@
 .DS_Store
+src/*.class
+src/dataStructures/*.class
+src/easyGui/*.class
+src/genericGui/*.class
+src/geometry/*.class
+src/org/eclipse/jdt/internal/jarinjarloader/*.class
+src/renderables/*.class
