@@ -248,22 +248,25 @@ public class PotentialFieldsRobot {
 	 */
 	private double evalMoveArc(IntPoint p, IntPoint goal) {
 		ArcSet arcs = get3Arcs(p  ,false );
-		double goalDist = (arcs.firstArc.arcLength +arcs.secondArc.arcLength + arcs.thirdArc.arcLength - radius) / 100; // Everything is divided by 10 because otherwise the
-																// numbers get too big
+		
+		// Everything is divided by 10 because otherwise the numbers get too big
+		double goalDist = (arcs.firstArc.arcLength +arcs.secondArc.arcLength + arcs.thirdArc.arcLength - radius) / 100;
+
 		double[] obsDists = new double[visibleObstacles.size()];
+
 		for (int i = 0; i < visibleObstacles.size(); i++) {
 			// Distance is set to 0 if it's closer than the radius to the obstacle
 			double distanceFromObstacle = distance(p, visibleObstacles.get(i)) - radius;
 			obsDists[i] = distanceFromObstacle <= 0 ? 0 : distanceFromObstacle / 100;
 		}
+
 		// Calculate field power - x^2 so value gets small as distance decreases
 		double goalField = Math.pow(goalDist, 2);
 
 
-
-		// obsField power is sum of all obstacles, and gets v. large as distance
-		// decreases and vice versa
+		// obsField power is sum of all obstacles, and gets v. large as distance decreases and vice versa
 		double obsField = 0;
+
 		for (int i = 0; i < visibleObstacles.size(); i++) {
 			if (obsDists[i] <= 0) {
 				obsField = Double.MAX_VALUE;
@@ -271,6 +274,7 @@ public class PotentialFieldsRobot {
 			} else if (obsDists[i] > sensorRange) {
 				continue;
 			}
+
 			obsField += Math.pow(Math.E, -1 / ((sensorRange) - obsDists[i])) / (obsDists[i]);
 		}
 
@@ -287,22 +291,25 @@ public class PotentialFieldsRobot {
 	 * @return The most valuable point
 	 */
 	private IntPoint evaluateSamplePointsArc() {
-		List<IntPoint> moves = getSamplePoints(); 
+		List<IntPoint> moves = getSamplePoints();
+
 		// If there's no moves that doesn't go through obstacles, quit
 		if (moves.isEmpty()) {
 			return null;
 		}
+
+
 		// Value of moves is a function of distance from goal & distance from detected objects
 		double[] moveValues = new double[moves.size()];
+
 		for (int i = 0; i < moves.size(); i++) {
 			moveValues[i] = evalMoveArc(moves.get(i), this.goal);
-                        
 		}
-                
-               
+
 		return moves.get(minIndex(moveValues)); // Return the lowest valued move
 	}
-	
+
+
 	/**
 	 * Move the robot 1 step towards the goal (point of least potential resistance)
 	 * 
@@ -312,22 +319,24 @@ public class PotentialFieldsRobot {
 		IntPoint moveTo = evaluateSamplePoints(); // Pick a sample point to move towards
 		if (moveTo == null)
 			return false;
-                
-                
+
+
 		IntPoint makeMove = evaluateMovePoints(moveTo); // Find the best move point using current sample as goal TODO: what if another sample point could be used and fail with this one?
+
 		if (makeMove == null)
 			return false;
-                
-                setArcs(get3Arcs(moveTo   ,  true )); 
-                
-		double newHeading =calculateHeading(makeMove);
-                
-               
-                
+
+
+        setArcs(get3Arcs(moveTo, true)); 
+
+		double newHeading = calculateHeading(makeMove);
+
 		moveTowards(newHeading); // Make the move
+
 		return true;
 	}
-	
+
+
 	/**
 	 * Have the robot move along a certain heading
 	 * 
@@ -347,8 +356,10 @@ public class PotentialFieldsRobot {
 			robotPic.x += coords.x;
 			robotPic.y += coords.y;
 		}
+
 		this.heading =   Calculator.mod(newHeading, Math.PI * 2);
 	}
+
 
 	/**
 	 * Find the heading that the robot must move to in order to reach a certain
@@ -374,6 +385,7 @@ public class PotentialFieldsRobot {
 
 		return angle;
 	}
+
 
 	/**
 	 * Evaluate all of the robot's potential movement positions & return the best.
@@ -406,18 +418,23 @@ public class PotentialFieldsRobot {
 	 */
 	private IntPoint evaluateMovePoints(IntPoint goal) {
 		List<IntPoint> moves = getMoveablePoints();
+
 		// If there's no moves that don't go through obstacles, quit
 		if (moves.isEmpty()) {
 			return null;
 		}
-		// Value of moves is a function of distance from goal & distance from detected
-		// objects
+
+
+		// Value of moves is a function of distance from goal & distance from detected objects
 		double[] moveValues = new double[moves.size()];
+
 		for (int i = 0; i < moves.size(); i++) {
 			moveValues[i] = evalMove(moves.get(i), goal);
 		}
+
 		return moves.get(minIndex(moveValues)); // Return the lowest valued move
 	}
+
 
 	/**
 	 * Get the potential field at point p. The lower the value returned, the better
@@ -428,19 +445,23 @@ public class PotentialFieldsRobot {
 	 */
 	private double evalMove(IntPoint p, IntPoint goal) {
 		// Get distances to goal & all visible objects
-		double goalDist = (distance(p, goal) - radius) / 10; // Everything is divided by 10 because otherwise the
-																// numbers get too big
+		// Everything is divided by 10 because otherwise the numbers get too big
+		double goalDist = (distance(p, goal) - radius) / 10;
+
 		double[] obsDists = new double[visibleObstacles.size()];
+
 		for (int i = 0; i < visibleObstacles.size(); i++) {
 			// Distance is set to 0 if it's closer than the radius to the obstacle
 			double distanceFromObstacle = distance(p, visibleObstacles.get(i)) - radius;
 			obsDists[i] = distanceFromObstacle <= 0 ? 0 : distanceFromObstacle / 10;
 		}
+
 		// Calculate field power - x^2 so value gets small as distance decreases
 		double goalField = Math.pow(goalDist, 2);
-		// obsField power is sum of all obstacles, and gets v. large as distance
-		// decreases and vice versa
+
+		// obsField power is sum of all obstacles, and gets v. large as distance decreases and vice versa
 		double obsField = 0;
+
 		for (int i = 0; i < visibleObstacles.size(); i++) {
 			if (obsDists[i] <= 0) {
 				obsField = Double.MAX_VALUE;
@@ -448,6 +469,7 @@ public class PotentialFieldsRobot {
 			} else if (obsDists[i] > sensorRange) {
 				continue;
 			}
+
 			obsField += Math.pow(Math.E, -1 / ((sensorRange) - obsDists[i])) / (obsDists[i]);
 		}
 		
@@ -461,27 +483,36 @@ public class PotentialFieldsRobot {
 	 */
 	public List<IntPoint> getMoveablePoints() {
 		List<IntPoint> moveablePoints = new ArrayList<IntPoint>(5);
+
 		double angleBetween = Math.toRadians(3);
 		double currentAngle = mod(heading - Math.toRadians(12), 2 * Math.PI);
+
 		for (int i = 0; i < 9; i++) {
 			// Only make this a 'moveable' point if it does not touch an obstacle
 			Line2D.Double line = new Line2D.Double();
 			IntPoint p2 = getPointTowards(currentAngle, stepSize);
+
 			line.setLine(coords.x, coords.y, p2.x, p2.y);
+
 			// Check if this line intersects an obstacle, and if so, don't add it
 			boolean crash = false;
+
 			for (IntPoint p : visibleObstacles) {
 				if (distance(p, p2) <= radius) {
 					crash = true;
 				}
 			}
+
 			if (intersects(line) == null && !crash) {
 				moveablePoints.add(p2);
 			}
+
 			currentAngle = mod((currentAngle + angleBetween), 2 * Math.PI);
 		}
+
 		return moveablePoints;
 	}
+
 
 	/**
 	 * Get a list of all the sample points evenly distributed in a 180-degree arc in
@@ -489,51 +520,51 @@ public class PotentialFieldsRobot {
 	 **/
 	public List<IntPoint> getSamplePoints() {
 		List<IntPoint> moveablePoints = new ArrayList<IntPoint>(sensorDensity);
+
 		double angleInterval = Math.PI / (sensorDensity - 1);
 		double currentAngle = mod(heading - Math.PI / 2, 2 * Math.PI);
-                double  distToObstical = distanceToClosestObstacle() ;   
+        double  distToObstical = distanceToClosestObstacle() ;   
 
-                    sampleSize  = sampleSizeDefault ;
-                
-                  
-                 
-                if( distToObstical !=0  && sampleSize >  distToObstical   ) 
-                    sampleSize =  (int) (distToObstical/2.0 );
-                
-                
-                
-                   
-                  
-                 if ( distance(goal, coords )/2.0 < sampleSize )
-                    sampleSize =(int)( distance(goal, coords )/2.0);
-                 if ( sampleSize  <  radius )
-                     sampleSize = radius+1   ; 
-                 
-                 if(sampleSize <=10    )  
-                     sampleSize  = 10 ; 
-                   
-                    
-               
-                 
-                   
+        sampleSize  = sampleSizeDefault ;
+
+
+        if (distToObstical !=0 && sampleSize > distToObstical)
+            sampleSize =  (int) (distToObstical/2.0 );
+
+
+        if ( distance(goal, coords )/2.0 < sampleSize )
+            sampleSize = (int) (distance(goal, coords ) / 2.0);
+
+        if (sampleSize < radius)
+            sampleSize = radius + 1; 
+
+        if(sampleSize <= 10) 
+            sampleSize = 10; 
+
+
 		for (int i = 0; i < sensorDensity; i++) {
 			// Only make this a 'moveable' point if it does not touch an obstacle
 			Line2D.Double line = new Line2D.Double();
 			IntPoint p2 = getPointTowards(currentAngle, sampleSize);
+
 			line.setLine(coords.x, coords.y, p2.x, p2.y);
 			
-				moveablePoints.add(p2);
+			moveablePoints.add(p2);
 			currentAngle += angleInterval;
 		}
-                stepSize =   (int)(sampleSize /2.0)  ; 
-                if( stepSize <=1   )
-                    stepSize = 2; 
-                if( stepSize > 10  )
-                    stepSize  =10 ;  
-                
-                    
+
+
+        stepSize = (int) (sampleSize / 2.0);
+
+         if( stepSize <= 1)
+        	 stepSize = 2;
+
+         if( stepSize > 10)
+        	 stepSize = 10 ;  
+                   
 		return moveablePoints;
 	}
+
 
 	/**
 	 * Get all of the points the robot can move to - the number is equal to the
@@ -543,25 +574,34 @@ public class PotentialFieldsRobot {
 	 **/
 	public List<IntPoint> getSensorablePoints() {
 		List<IntPoint> sensorablePoints = new ArrayList<IntPoint>(sensorDensity);
+
 		visibleObstacles = new ArrayList<IntPoint>();
+
 		double angleBetween = Math.PI / (sensorDensity - 1);
 		double currentAngle = mod(heading - Math.PI / 2, 2 * Math.PI);
-                
+
 		for (int i = 0; i < sensorDensity; i++) {
 			int sensorRange = this.sensorRange;
+
 			// Check for intersecting obstacles
 			IntPoint edge = getPointTowards(currentAngle, sensorRange);
+
 			Line2D.Double sensorLine = new Line2D.Double(new Point(coords.x, coords.y), new Point(edge.x, edge.y));
+			
 			IntPoint intersection = intersects(sensorLine);
+
 			if (intersection != null) {
 				sensorRange = (int) distance(intersection, coords);
 				visibleObstacles.add(intersection);
 			}
+
 			sensorablePoints.add(getPointTowards(currentAngle, sensorRange));
 			currentAngle += angleBetween;
 		}
+
 		return sensorablePoints;
 	}
+
 
 	/**
 	 * Get the closest point where this line crosses an obstacle - this varies based
@@ -572,16 +612,21 @@ public class PotentialFieldsRobot {
 	 */
 	private IntPoint intersects(Line2D.Double line) {
 		ArrayList<IntPoint> intersections = new ArrayList<IntPoint>();
+
 		for (Renderable obstacle : obstacles) {
+
 			if (obstacle.getClass() == RenderablePolyline.class) {
 				ArrayList<Integer> xs = ((RenderablePolyline) obstacle).xPoints;
 				ArrayList<Integer> ys = ((RenderablePolyline) obstacle).yPoints;
+
 				for (int i = 0; i < xs.size() - 1; i++) {
 					Line2D.Double obsLine = new Line2D.Double(xs.get(i), ys.get(i), xs.get(i + 1), ys.get(i + 1));
 					IntPoint intersect = getIntersectionPoint(line, obsLine);
+
 					if (intersect != null)
 						intersections.add(intersect);
 				}
+
 			} else if (obstacle.getClass() == RenderableRectangle.class) {
 				/*
 				 * Rectangle is treated like a polygon but since because it's a different class
@@ -590,6 +635,7 @@ public class PotentialFieldsRobot {
 				 */
 				ArrayList<Integer> xs = new ArrayList<Integer>();
 				ArrayList<Integer> ys = new ArrayList<Integer>();
+
 				xs.add(((RenderableRectangle) obstacle).bottomLeftX);
 				xs.add(((RenderableRectangle) obstacle).bottomLeftX);
 				xs.add(((RenderableRectangle) obstacle).bottomLeftX + ((RenderableRectangle) obstacle).width);
@@ -603,7 +649,9 @@ public class PotentialFieldsRobot {
 				for (int i = 0; i < xs.size(); i++) {
 					Line2D.Double obsLine = new Line2D.Double(xs.get(i), ys.get(i), xs.get((i + 1) % xs.size()),
 							ys.get((i + 1) % ys.size()));
+
 					IntPoint intersect = getIntersectionPoint(line, obsLine);
+
 					if (intersect != null)
 						intersections.add(intersect);
 				}
@@ -611,42 +659,53 @@ public class PotentialFieldsRobot {
 			} else if (obstacle.getClass() == RenderablePolygon.class) {
 				ArrayList<Integer> xs = ((RenderablePolygon) obstacle).xPoints;
 				ArrayList<Integer> ys = ((RenderablePolygon) obstacle).yPoints;
+
 				for (int i = 0; i < xs.size(); i++) {
-					Line2D.Double obsLine = new Line2D.Double(xs.get(i), ys.get(i), xs.get((i + 1) % xs.size()),
-							ys.get((i + 1) % ys.size()));
+					Line2D.Double obsLine = new Line2D.Double(xs.get(i), ys.get(i), xs.get((i + 1) % xs.size()), ys.get((i + 1) % ys.size()));
+
 					IntPoint intersect = getIntersectionPoint(line, obsLine);
+
 					if (intersect != null)
 						intersections.add(intersect);
 				}
+
 			} else if (obstacle.getClass() == RenderableOval.class) {
+
 				// ovals are treated as their bounding polygons (90-sided) and they have to be
 				// circles
 				ArrayList<Integer> xs = new ArrayList<Integer>();
 				ArrayList<Integer> ys = new ArrayList<Integer>();
+
 				RenderableOval roval = (RenderableOval) obstacle;
+
 
 				for (int i = 0; i < 90; i++) {
 					int trigPoint = (int) (roval.width / 2 * Math.cos(i * Math.PI / 45));
+
 					xs.add(roval.centreX + trigPoint);
 				}
 
 				for (int i = 0; i < 90; i++) {
 					int trigPoint = (int) (roval.width / 2 * Math.sin(i * Math.PI / 45));
+
 					ys.add(roval.centreY + trigPoint);
 				}
 
 				for (int i = 0; i < xs.size(); i++) {
-					Line2D.Double obsLine = new Line2D.Double(xs.get(i), ys.get(i), xs.get((i + 1) % xs.size()),
-							ys.get((i + 1) % ys.size()));
+					Line2D.Double obsLine = new Line2D.Double(xs.get(i), ys.get(i), xs.get((i + 1) % xs.size()), ys.get((i + 1) % ys.size()));
+					
 					IntPoint intersect = getIntersectionPoint(line, obsLine);
+					
 					if (intersect != null)
 						intersections.add(intersect);
 				}
 
 			}
 		}
+
 		return intersections.isEmpty() ? null : lowestDist(intersections);
 	}
+
 
 	/**
 	 * Get the closest point to the robot's coords
@@ -658,12 +717,15 @@ public class PotentialFieldsRobot {
 	 **/
 	private IntPoint lowestDist(ArrayList<IntPoint> points) {
 		int lowest = 0;
+
 		for (int i = 0; i < points.size(); i++) {
 			if (distance(points.get(i), coords) < distance(points.get(lowest), coords))
 				lowest = i;
 		}
+
 		return points.get(lowest);
 	}
+
 
 	/**
 	 * Get the point 'step' pixels along the given heading from the robot's position
@@ -676,20 +738,25 @@ public class PotentialFieldsRobot {
 	private IntPoint getPointTowards(double heading, int step) {
 		int length = (int) (step * Math.cos(heading));
 		int height = (int) (step * Math.sin(heading));
+
 		return new IntPoint(coords.x + length, coords.y + height);
 	}
+
 
 	/**
 	 * Get the position of the minimum value in the array
 	 **/
 	private int minIndex(double[] nums) {
 		int minIndex = 0;
+
 		for (int i = 1; i < nums.length; i++) {
 			if (nums[i] < nums[minIndex])
 				minIndex = i;
 		}
+
 		return minIndex;
 	}
+
 
 	/**
 	 * Get the distance between two points.
@@ -698,12 +765,14 @@ public class PotentialFieldsRobot {
 		return Math.sqrt(Math.pow((a.x - b.x), 2) + Math.pow((a.y - b.y), 2));
 	}
 
+
 	/**
 	 * Check if the robot falls within the goal radius.
 	 **/
 	public boolean inGoal() {
 		return distance(coords, goal) < goalRadius + radius;
 	}
+
 
 	/**
 	 * Calculate the intersection point of two lines, or return null if there is no
@@ -718,19 +787,24 @@ public class PotentialFieldsRobot {
 	private static IntPoint getIntersectionPoint(Line2D.Double line1, Line2D.Double line2) {
 		if (!line1.intersectsLine(line2))
 			return null;
+
 		double px = line1.getX1(), py = line1.getY1(), rx = line1.getX2() - px, ry = line1.getY2() - py;
 		double qx = line2.getX1(), qy = line2.getY1(), sx = line2.getX2() - qx, sy = line2.getY2() - qy;
 
 		double det = sx * ry - sy * rx;
+
 		if (det == 0) {
 			return null;
 		} else {
 			double z = (sx * (qy - py) + sy * (px - qx)) / det;
+
 			if (z == 0 || z == 1)
 				return null; // intersection at end point
+
 			return new IntPoint((int) (px + z * rx), (int) (py + z * ry));
 		}
 	}
+
 
 	/**
 	 * Calculate a % b, but always result in a positive answer - java's default
@@ -741,6 +815,7 @@ public class PotentialFieldsRobot {
 	private static double mod(double a, double b) {
 		return ((a % b) + b) % b;
 	}
+
 
 	/**
 	 * Find the distance from the robot to the closest visible obstacle, or some
@@ -756,7 +831,8 @@ public class PotentialFieldsRobot {
 		return (int) Math.round(distance(coords, visibleObstacles.get(closestIndex)));
 	}
 
-	
+
+
 	// Getters:
 
 	public int getStepSize() {

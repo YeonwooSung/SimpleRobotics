@@ -501,7 +501,9 @@ public class PotentialFields {
 	 * Get the parameters from the text fields and use these to set the robot moving
 	 **/
 	public void buttonAction() throws InterruptedException {
-		int startX, startY, goalX, goalY, radius, robotRadius, robotSensorRange, robotSensorDensity, robotSpeed, power, box, goal;
+		int startX, startY, goalX, goalY, radius, robotRadius, robotSensorRange;
+		int robotSensorDensity, robotSpeed, power, box, goal;
+
 		Random rand = new Random();
 		String startXs = gui.getTextFieldContent(startXId);
 		String startYs = gui.getTextFieldContent(startYId);
@@ -512,72 +514,80 @@ public class PotentialFields {
 		String robotSensorRanges = gui.getTextFieldContent(robotSensorRangeId);
 		String robotSensorDensitys = gui.getTextFieldContent(robotSensorDensityId);
 		String robotSpeeds = gui.getTextFieldContent(robotSpeedId);
+
 //		String powers = gui.getTextFieldContent(powerId);
 //		String boxes = gui.getTextFieldContent(boxId);
 //		String goals = gui.getTextFieldContent(goalId);
 //                
                 
-               String headingStr  =  gui.getTextFieldContent(headingR) ;
-                double  headingD   = 0.0 ; 
-               if (! headingStr.isEmpty()) 
-                headingD =  Double.parseDouble ( headingStr); 
-               gui.setTextFieldContent(headingR, "" + headingD);
-               
-		
-		startX = getProp(startXs, rand, frameLength);
-		gui.setTextFieldContent(startXId, "" + startX);
+       String headingStr =  gui.getTextFieldContent(headingR);
+       double headingD = 0.0 ;
 
-		startY = getProp(startYs, rand, frameHeight);
-		gui.setTextFieldContent(startYId, "" + startY);
+       if (! headingStr.isEmpty()) 
+    	   headingD =  Double.parseDouble ( headingStr);
+       gui.setTextFieldContent(headingR, "" + headingD);
 
-		goalX = getProp(goalXs, rand, frameLength);
-		gui.setTextFieldContent(goalXId, "" + goalX);
 
-		goalY = getProp(goalYs, rand, frameHeight);
-		gui.setTextFieldContent(goalYId, "" + goalY);
+       startX = getProp(startXs, rand, frameLength);
+       gui.setTextFieldContent(startXId, "" + startX);
 
-		if (radiuss.isEmpty())
-			radius = rand.nextInt(70) + 30; // Radius is between 30 and 100
-		else
-			radius = Integer.parseInt(radiuss);
-		gui.setTextFieldContent(goalRadiusId, "" + radius);
+       startY = getProp(startYs, rand, frameHeight);
+       gui.setTextFieldContent(startYId, "" + startY);
 
-		if (robotRadiuss.isEmpty())
-			robotRadius = rand.nextInt(20) + 20; // Robot radius between 20 and 40
-		else
-			robotRadius = Integer.parseInt(robotRadiuss);
-		gui.setTextFieldContent(robotRadiusId, "" + robotRadius);
+       goalX = getProp(goalXs, rand, frameLength);
+       gui.setTextFieldContent(goalXId, "" + goalX);
 
-		if (robotSensorRanges.isEmpty())
-			robotSensorRange = rand.nextInt(300) + 100; // between 50 and 200
-		else
-			robotSensorRange = Integer.parseInt(robotSensorRanges);
-		gui.setTextFieldContent(robotSensorRangeId, "" + robotSensorRange);
+       goalY = getProp(goalYs, rand, frameHeight);
+       gui.setTextFieldContent(goalYId, "" + goalY);
 
-		if (robotSensorDensitys.isEmpty())
-			robotSensorDensity = rand.nextInt(175) + 5; // between 5 and 180
-		else
-			robotSensorDensity = Integer.parseInt(robotSensorDensitys);
-		gui.setTextFieldContent(robotSensorDensityId, "" + robotSensorDensity);
 
-		if (robotSpeeds.isEmpty())
-			robotSpeed = 40; // Default speed is 40 moves per second
-		else
-			robotSpeed = Integer.parseInt(robotSpeeds);
-		gui.setTextFieldContent(robotSpeedId, "" + robotSpeed);
+       if (radiuss.isEmpty())
+    	   radius = rand.nextInt(70) + 30; // Radius is between 30 and 100
+       else
+    	   radius = Integer.parseInt(radiuss);
 
-		if (robotSpeeds.isEmpty())
-			robotSpeed = 40; // Default speed is 40 moves per second
-		else
-			robotSpeed = Integer.parseInt(robotSpeeds);
-		gui.setTextFieldContent(robotSpeedId, "" + robotSpeed);
-		
-	
-		String image = mike ? "mike.png" : null;
-	
-		goLittleRobot(new IntPoint(startX, startY), new IntPoint(goalX, goalY), radius, robotRadius, robotSensorRange,
-				robotSensorDensity, robotSpeed, image, /*power, goal, box,*/headingD );
+       gui.setTextFieldContent(goalRadiusId, "" + radius);
+
+
+       if (robotRadiuss.isEmpty())
+    	   robotRadius = rand.nextInt(20) + 20; // Robot radius between 20 and 40
+       else
+    	   robotRadius = Integer.parseInt(robotRadiuss);
+       gui.setTextFieldContent(robotRadiusId, "" + robotRadius);
+
+
+       if (robotSensorRanges.isEmpty())
+    	   robotSensorRange = rand.nextInt(300) + 100; // between 50 and 200
+       else
+    	   robotSensorRange = Integer.parseInt(robotSensorRanges);
+
+       gui.setTextFieldContent(robotSensorRangeId, "" + robotSensorRange);
+
+       if (robotSensorDensitys.isEmpty())
+    	   robotSensorDensity = rand.nextInt(175) + 5; // between 5 and 180
+       else
+    	   robotSensorDensity = Integer.parseInt(robotSensorDensitys);
+       gui.setTextFieldContent(robotSensorDensityId, "" + robotSensorDensity);
+
+       if (robotSpeeds.isEmpty())
+    	   robotSpeed = 40; // Default speed is 40 moves per second
+       else
+    	   robotSpeed = Integer.parseInt(robotSpeeds);
+       gui.setTextFieldContent(robotSpeedId, "" + robotSpeed);
+
+       if (robotSpeeds.isEmpty())
+    	   robotSpeed = 40; // Default speed is 40 moves per second
+       else
+    	   robotSpeed = Integer.parseInt(robotSpeeds);
+       gui.setTextFieldContent(robotSpeedId, "" + robotSpeed);
+
+
+       String image = mike ? "mike.png" : null;
+
+       goLittleRobot(new IntPoint(startX, startY), new IntPoint(goalX, goalY), radius, robotRadius, robotSensorRange,
+    		   robotSensorDensity, robotSpeed, image, /*power, goal, box,*/headingD );
 	}
+
 
 	/**
 	 * Set the robot moving towards a goal on the screen with set radius, step size,
@@ -600,15 +610,14 @@ public class PotentialFields {
 	 */
 	public void goLittleRobot(IntPoint start, IntPoint goal, int goalRad, int robotRadius, int robotSensorRange,
 			int robotSensorDensity, int robotSpeed, String image,/* int power, int goalFactor, int box ,*/ double headingR) throws InterruptedException {
+
 		// Disable all buttons while robot is active TODO
 		setButtons(false);
 		stop = false;
 
 		// Create the robot, start & end points, renderables
-              
-		PotentialFieldsRobot rob = new PotentialFieldsRobot(image, start, goal, robotRadius, robotSensorRange,
-				robotSensorDensity, goalRad, obstacles,/* power, goalFactor, box,*/headingR);
-                
+		PotentialFieldsRobot rob = new PotentialFieldsRobot(image, start, goal, robotRadius, robotSensorRange, robotSensorDensity, goalRad, obstacles,/* power, goalFactor, box,*/headingR);
+
 		RRTree startAndGoal = new RRTree(Color.black);
 		startAndGoal.setStartAndGoal(start, goal, goalRad);
 		RenderableString rs = null;
@@ -625,7 +634,9 @@ public class PotentialFields {
 		drawRobot(rob);
 		gui.update();
 
+
 		int l = 0;
+
 		// Loop until the robot reaches the goal or gets stuck
 		while (!rob.inGoal()) {
 			do {
@@ -653,25 +664,20 @@ public class PotentialFields {
 			gui.draw(path);
 			gui.draw(obstacles);
 			drawRobot(rob);
-			
+
 			// Draw movement arcs
 			if ( true /* ArcPlanner*/   ) {
 				drawArc(rob.getFirstArc(), Color.BLACK);
-                                  if (  !  ArcPlanner  &&  !arcs  )
-                                  {
-                                     
-                                    
-                                      MyArc  newArc =  new MyArc(rob. getSecondArc().p1 ,  rob. getThirdArc().p2  ,rob. getSecondArc().startHeading , true );
-                                     
-                                      
-                                      
-                                     drawArc(newArc  , Color.PINK   ); 
-                                  }
-                                  else {
-                                    drawArc(rob.getSecondArc(), Color.PINK);
-                                    drawArc(rob.getThirdArc(), Color.DARK_GRAY);
-                                  }
+
+                if (!ArcPlanner && !arcs) {
+                	MyArc  newArc =  new MyArc(rob. getSecondArc().p1 ,  rob. getThirdArc().p2  ,rob. getSecondArc().startHeading , true );
+                    drawArc(newArc  , Color.PINK   ); 
+                } else {
+                    drawArc(rob.getSecondArc(), Color.PINK);
+                    drawArc(rob.getThirdArc(), Color.DARK_GRAY);
+                }
 			}
+
 
 			// Print path length so far
 			gui.unDraw(rs);
@@ -701,23 +707,25 @@ public class PotentialFields {
 	}
 
 	private void drawArc(MyArc arc, Color c) {
-		if (arc != null)
-		{
-                    
-                 
-			RenderablePolyline polyline = arc.getRenderablePolyline(arcs);
+		if (arc != null) {
+            RenderablePolyline polyline = arc.getRenderablePolyline(arcs);
                         
 //			addVectorToLine(arc.getStartPoint(), polyline);
 //			addVectorToLine(arc.getEndPoint(), polyline);
 			polyline.setProperties(c, 5f);
 			gui.draw(polyline);
 		}
+
 	}
 
 
-	
-	
-	
+	/**
+	 * Checks the given boolean value, and enable all buttons if it is true.
+	 * Otherwise, make all buttons disabled.
+	 *
+	 * @param enabled
+	 * 			It would be true if the buttons should be enabled. Otherwise, false.
+	 */
 	public void setButtons(boolean enabled) {
 		gui.setButtonEnabled(buttonId, enabled);
 		gui.setButtonEnabled(circleSId, enabled);
@@ -729,8 +737,9 @@ public class PotentialFields {
 		gui.setButtonEnabled(easyCourseId, enabled);
 		gui.setButtonEnabled(medCourseId, enabled);
 		gui.setButtonEnabled(hardCourseId, enabled);
-                gui.setButtonEnabled(newobsticalShape, enabled);
+        gui.setButtonEnabled(newobsticalShape, enabled);
 	}
+
 
 	/**
 	 * Draw the robot, its sensors (in green), and all of the points it can move to
@@ -738,21 +747,31 @@ public class PotentialFields {
 	 */
 	private void drawRobot(PotentialFieldsRobot rob) {
 		gui.draw(rob.getImage());
+
 		try {
 			Thread.sleep(1); // necessary when rendering images to give them time to load
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
-		for(IntPoint p :rob.getSensorablePoints()) {
+
+		for (IntPoint p :rob.getSensorablePoints()) {
 			RenderablePolyline r = new RenderablePolyline();
+
 			r.addPoint(rob.getPosition().x, rob.getPosition().y);
 			r.addPoint(p.x, p.y);
 			r.setProperties(Color.GREEN, 1f);
+
 			RenderablePoint pp = new RenderablePoint(p.x, p.y);
+
 			pp.setProperties(Color.GREEN, 5f);
+
+
+			//draw the renderable point and polyline on the gui.
+
 			gui.draw(r);
 			gui.draw(pp);
 		}
+
 		for(IntPoint p :rob.getSamplePoints()) {
 			RenderablePolyline r = new RenderablePolyline();
 			r.addPoint(rob.getPosition().x, rob.getPosition().y);
@@ -765,13 +784,17 @@ public class PotentialFields {
 		}
 	}
 
+
 	/**
 	 * Smoothness metric. 0 = completely smooth, high values = not very smooth
 	 **/
 	private double calculateSmoothness(RenderablePolyline line) {
+
 		if (line.xPoints.size() < 20)
 			return 0;
+
 		double totalDiff = 0;
+
 		for (int i = 0; i < line.xPoints.size() - 20; i += 10) {
 			IntPoint p1 = new IntPoint(line.xPoints.get(i), line.yPoints.get(i));
 			IntPoint pmid = new IntPoint(line.xPoints.get(i + 10), line.yPoints.get(i + 10));
@@ -781,8 +804,10 @@ public class PotentialFields {
 
 			double distance = Math.abs((p2.y - p1.y) * pmid.x - (p2.x - p1.x) * pmid.y + p2.x * p1.y - p2.y * p1.x)
 					/ Math.sqrt(Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2));
+
 			totalDiff += distance;
 		}
+
 		return totalDiff / line.xPoints.size();
 	}
 }
