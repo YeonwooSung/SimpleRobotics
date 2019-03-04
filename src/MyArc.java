@@ -17,12 +17,12 @@ class MyArc {
 
 	List<MyPoint> points = new ArrayList<MyPoint>();
 
+
 	// Construction:
 
 	/**
 	 * Constructs a MyArc instance.
 	 */
-
 	MyArc(MyPoint p1, MyPoint p2, double startHeading, boolean draw) {
 
 		startHeading = Calculator.mod(startHeading, (2 * Math.PI));
@@ -47,13 +47,13 @@ class MyArc {
 
 		if (anglec == Math.PI && curvature == 0)
 			curvature = 1 / distance;
+
 		this.curvature = curvature;
+
 		if (curvature == 0 || anglec == 0) {
-
 			MyPoint VectorX = new MyPoint(p2.x - p1.x, p2.y - p1.y);
-			for (double i = 0; i < distance; i = i + step)
 
-			{
+			for (double i = 0; i < distance; i = i + step) {
 				double x = p1.x + VectorX.x * i / distance;
 				double y = p1.y + VectorX.y * i / distance;
 				points.add(new MyPoint(x, y));
@@ -62,6 +62,8 @@ class MyArc {
 			return;
 
 		}
+
+
 		double raduis = 1.0 / curvature;
 		double halfdiameter = Math.PI * raduis;
 
@@ -82,9 +84,7 @@ class MyArc {
 
 	/* compute signed angle */
 
-	private static double computeAngleDirected(MyPoint vector1, MyPoint vector2)
-
-	{
+	private static double computeAngleDirected(MyPoint vector1, MyPoint vector2) {
 		double angle = Math.atan2(vector2.y, vector2.x) - Math.atan2(vector1.y, vector1.x);
 		return angle;
 	}
@@ -96,8 +96,9 @@ class MyArc {
 		return new MyPoint(x, y);
 
 	}
-	/* get the points on the arc -clockwise- */
 
+
+	/* get the points on the arc -clockwise- */
 	private static List<MyPoint> backwordOrder(double raduis, MyPoint center1, MyPoint point1, MyPoint point2,
 			double heading, double step, boolean small) {
 
@@ -127,13 +128,15 @@ class MyArc {
 		while (movedstep > 0) {
 			MyPoint point = new MyPoint(movedstep, -1 * Math.sqrt(raduis * raduis - (movedstep * movedstep)));
 			movedstep = movedstep - step;
+
 			if (Math.abs(point.y) > Math.abs(rotatedPoint.y) && angle < Math.PI / 2.0)
 				break;
-			arc1.add(point);
 
+			arc1.add(point);
 		}
 
 		movedstep = 0;
+
 		if (angle > Math.PI / 2.0) {
 			while (movedstep > -raduis) {
 				if (angle < Math.PI && movedstep < rotatedPoint.x) {
@@ -170,7 +173,9 @@ class MyArc {
 			}
 
 		}
+
 		List<MyPoint> arc1x = new ArrayList<MyPoint>();
+
 		for (int i = 0; i < arc1.size(); i++) {
 			MyPoint RotatedP = rotate(arc1.get(i), rotatedAngle);
 			RotatedP = new MyPoint(RotatedP.x + center1.x, RotatedP.y + center1.y);
@@ -344,8 +349,8 @@ class MyArc {
 
 		}
 
-		// Angle between the two vectors is <90
 
+		// Angle between the two vectors is less than 90
 		if (Angle < Math.PI / 2.0) {
 			double lengthOfHeading = .5 * distance / Math.cos(Angle);
 			MyPoint thirdVertex = new MyPoint(p1.x + (headingVector.x * lengthOfHeading),
@@ -359,17 +364,21 @@ class MyArc {
 
 			return c1;
 
-		}
-		// Angle between the two vectors is >90
-		else {
+		} else { // Angle between the two vectors is greater than 90
+
 			double anglex = Math.PI - Angle;
 			double lengthOfHeading = .5 * distance / Math.cos(anglex);
+
 			MyPoint thirdVertex = new MyPoint(p1.x - (headingVector.x * lengthOfHeading),
 					p1.y - (headingVector.y * lengthOfHeading));
+
 			MyPoint midChordPoint = new MyPoint(p1.x + (VectorFromP1TpP2.x * .5), p1.y + (VectorFromP1TpP2.y * .5));
+
 			MyPoint VectorToCenter = new MyPoint(thirdVertex.x - midChordPoint.x, thirdVertex.y - midChordPoint.y);
+
 			double normOfCenter = Math.sqrt(VectorToCenter.x * VectorToCenter.x + VectorToCenter.y * VectorToCenter.y);
 			double lengthToCenter = Math.sqrt(radius * radius - (distance * .5) * (distance * .5));
+
 			c1 = new MyPoint(midChordPoint.x + (VectorToCenter.x * lengthToCenter / normOfCenter),
 					midChordPoint.y + (VectorToCenter.y * lengthToCenter / normOfCenter));
 
@@ -378,8 +387,10 @@ class MyArc {
 
 	}
 
+
 	public RenderablePolyline getRenderablePolyline(boolean srcDrawingEnabled) {
 		RenderablePolyline polyline = new RenderablePolyline();
+
 		if (srcDrawingEnabled)
 			for (MyPoint p : points)
 				polyline.addPoint((int) p.x, (int) p.y);
@@ -387,6 +398,7 @@ class MyArc {
 			polyline.addPoint((int) p1.x, (int) p1.y);
 			polyline.addPoint((int) p2.x, (int) p2.y);
 		}
+
 		return polyline;
 	}
 }

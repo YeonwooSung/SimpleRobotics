@@ -13,7 +13,7 @@ public class PotentialFieldsRobot {
 	//------------//
 	// Attributes //
 	//------------//
-	
+
 	// Robot:
 	private IntPoint coords; // Position of robot
 	private double heading; // Robot's heading in radians
@@ -81,16 +81,14 @@ public class PotentialFieldsRobot {
 			robotPicAlt.setProperties(Color.RED, (float) radius * 2);
 		} else {
 			robotPicAlt = null;
-                       
-			robotPic = new RenderableImg("images" + File.separator + imagePath, startingLocation.x, startingLocation.y,
-					radius * 2, radius * 2);
-                         
-                        
+
+			robotPic = new RenderableImg("images" + File.separator + imagePath, startingLocation.x, startingLocation.y, radius * 2, radius * 2);
 		}
+
 		this.coords = new IntPoint(startingLocation.x, startingLocation.y);
-                heading = headingR;
-               
-                
+        heading = headingR;
+
+
 		this.radius = radius;
 		this.sensorRange = sensorRange;
 		this.sensorDensity = sensorDensity;
@@ -101,6 +99,7 @@ public class PotentialFieldsRobot {
 
 	}
 
+
 	/**
 	 * arc planner  move method.
 	 * 
@@ -110,25 +109,26 @@ public class PotentialFieldsRobot {
 		IntPoint moveTo = evaluateSamplePointsArc(); // Pick a sample point to move towards
 		if (moveTo == null)
 			return false;
-		setArcs(get3Arcs(moveTo  ,  true ));
+
+		setArcs(get3Arcs(moveTo, true));
+
 		Vector robotPos = new Vector(coords.x, coords.y);
 		Vector samplePos = new Vector(moveTo.x, moveTo.y);
-		
+
 		double theta = Calculator.getTheta(heading, robotPos, samplePos);
-              
+
 		Vector chord = samplePos.diff(robotPos);
+
 		double chordLength = chord.getMagnitude();
 		double curvature = Calculator.getCurvature(theta, chordLength);
-		double arcLength = Calculator.getArcLength(theta, curvature ,chordLength   );
+		double arcLength = Calculator.getArcLength(theta, curvature, chordLength);
 		double headingChange =  getHeadingChangeInterval(theta, arcLength);
-                
-              
-                
+
 		moveTowards(heading + headingChange);
-              
-                
+
 		return true;
 	}
+
 
 	/**
 	 * Creates a 3 arcs system.
@@ -140,81 +140,79 @@ public class PotentialFieldsRobot {
 		Vector robotPos = new Vector(coords.x, coords.y);
 		Vector samplePos = new Vector(moveTo.x, moveTo.y);
 		Vector goalPos = new Vector(goal.x, goal.y);
-            
-            
+
 		// First arc  :angle  between current heading and thesample point :
 		double theta = Calculator.getTheta(heading, robotPos, samplePos);
-            
+
 		// Direction at sample calculations:
 		double headingAtSample = Calculator.mod((heading + 2.0* theta), (2*Math.PI));
-                
+
 		Vector segmentFromSampleToGoal = goalPos.diff(samplePos);
 		Vector directionAtSample = new Vector(Math.cos(headingAtSample), Math.sin(headingAtSample));
- 
+
 		// Calculate the 3 angles:
 		double alpha = Calculator.getAngleBetweenVector(directionAtSample, segmentFromSampleToGoal);
 		double absAlpha = Math.abs(alpha);
 		double beta = 0.5837 * alpha;
 		double absBeta = Math.abs(beta);
-		double absGamma = (Math.PI - .5*absAlpha - .5*absBeta)  ;
-				
+		double absGamma = (Math.PI - .5*absAlpha - .5*absBeta);
+
 		// Calculate chords and arcs lengths:
 		double secondChordLength = segmentFromSampleToGoal.getMagnitude() * Math.sin(0.5 * absBeta) / Math.sin(absGamma);
-                
-                
-                if( absAlpha ==0 || absBeta == 0  )
-                 secondChordLength  =    goalPos.diff(samplePos).getMagnitude()/2.0 ; ;   
-               
+   
+	    if (absAlpha == 0 || absBeta == 0) {
+	    	secondChordLength  =    goalPos.diff(samplePos).getMagnitude()/2.0;   
+	    }
+
 		Vector posV = getPosV(samplePos, secondChordLength, headingAtSample  );
-               
-		
-		
+
+
 		double headingAtV   =  Calculator.mod((headingAtSample +2*Calculator.getTheta(headingAtSample, samplePos, posV) ), (2*Math.PI));
-                
-		
-                
+
+
 		MyArc first = new MyArc(new MyPoint(robotPos), new MyPoint(samplePos), heading  ,draw );
-                
+
 		MyArc second = new MyArc(new MyPoint(samplePos), new MyPoint(posV), headingAtSample  ,draw );
-                 
-		MyArc third = new MyArc(new MyPoint(posV), new MyPoint(goalPos), headingAtV  ,draw );
-              
+          
+		MyArc third = new MyArc(new MyPoint(posV), new MyPoint(goalPos), headingAtV, draw );
+
 		return new ArcSet(first, second, third);
 	}
-        
-        /*
-        compute the  point  that seperate the  secound arc from the  third arc    
-        */
-        private Vector getPosV(Vector samplePos, double secondChordLength ,double headingAtSamplex ) {
+
+
+    /**
+     * Compute the  point  that seperate the  secound arc from the  third arc    
+     */
+    private Vector getPosV(Vector samplePos, double secondChordLength ,double headingAtSamplex ) {
 		Vector xAxis = new Vector (secondChordLength, 0);
-                 double  directedAngle3   =   Calculator.getTheta(headingAtSamplex, new Vector( coords.x  ,coords.y ) ,new Vector(goal.x , goal.y)  )  /2.0; 
-                
-               Vector Rotated =  new Vector (xAxis.x * Math.cos(headingAtSamplex+ directedAngle3  ) -xAxis.y* Math.sin(headingAtSamplex+ directedAngle3)     , xAxis.x * Math.sin(headingAtSamplex+ directedAngle3) +xAxis.y* Math.sin(headingAtSamplex+ directedAngle3)  );
-                Vector posV  =  samplePos.add(  Rotated );  
-                
-		
-//              
-                 
-                return posV;
+
+        double directedAngle3 = Calculator.getTheta(headingAtSamplex, new Vector( coords.x  ,coords.y ) ,new Vector(goal.x , goal.y)  )  /2.0; 
+
+        Vector Rotated =  new Vector (xAxis.x * Math.cos(headingAtSamplex+ directedAngle3  ) -xAxis.y* Math.sin(headingAtSamplex+ directedAngle3)     , xAxis.x * Math.sin(headingAtSamplex+ directedAngle3) +xAxis.y* Math.sin(headingAtSamplex+ directedAngle3)  );
+        Vector posV  =  samplePos.add(  Rotated );  
+   
+        return posV;
 	}
 
-	
+
 
 	private void setArcs(ArcSet arcs) {
 		firstArc = arcs.firstArc;
 		secondArc = arcs.secondArc;
-		thirdArc = arcs.thirdArc;		
+		thirdArc = arcs.thirdArc;
 	}
-	
+
+
 	private double getHeadingChangeInterval(double theta, double arcLength) {
 		return stepSize * 2.0 * theta / arcLength;
 	}
+
 
     /**
      * compute the Obstacle potential for point P  
      * @return Obstacle potential 
      */
-    private  double  getObstaclePotential ( IntPoint p  ) {
+    private double getObstaclePotential(IntPoint p) {
 
         double[] obsDists = new double[visibleObstacles.size()];
 
@@ -233,8 +231,10 @@ public class PotentialFieldsRobot {
 			} else if (obsDists[i] > sensorRange) {
 				continue;
 			}
+
 			obsField += Math.pow(Math.E, -1 / ((sensorRange) - obsDists[i])) / (obsDists[i]);
 		}
+
         return obsField;
     }
 
@@ -247,8 +247,8 @@ public class PotentialFieldsRobot {
 	 * @return The value of the point
 	 */
 	private double evalMoveArc(IntPoint p, IntPoint goal) {
-		ArcSet arcs = get3Arcs(p  ,false );
-		
+		ArcSet arcs = get3Arcs(p, false);
+
 		// Everything is divided by 10 because otherwise the numbers get too big
 		double goalDist = (arcs.firstArc.arcLength +arcs.secondArc.arcLength + arcs.thirdArc.arcLength - radius) / 100;
 
@@ -472,9 +472,10 @@ public class PotentialFieldsRobot {
 
 			obsField += Math.pow(Math.E, -1 / ((sensorRange) - obsDists[i])) / (obsDists[i]);
 		}
-		
+
 		return 10 * goalField + Math.pow(2 * radius, 2) * 4750 * obsField / (sensorDensity * sensorRange);
 	}
+
 
 	/**
 	 * Get all of the points the robot can move to - the robot moves 10 pixels
@@ -860,7 +861,7 @@ public class PotentialFieldsRobot {
 	public MyArc getFirstArc() { //TODO: null pointer exception moving between plannars halway
 		return firstArc;
 	}
-	
+
 	public MyArc getSecondArc() {
 		return secondArc;
 	}

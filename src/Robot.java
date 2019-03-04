@@ -23,6 +23,7 @@ public class Robot {
 		gui.show();
 	}
 
+
 	/**
 	 * Runs the robot with RRT type instance.
 	 */
@@ -32,6 +33,7 @@ public class Robot {
 		rt.runRobot();
 	}
 
+
 	/**
 	 * Runs the robot with PotentialFields type instance.
 	 */
@@ -40,6 +42,7 @@ public class Robot {
 		PotentialFields fields = new PotentialFields();
 		fields.runRobot();
 	}
+
 
 	// MAIN
 	public static void main(String[] args) {

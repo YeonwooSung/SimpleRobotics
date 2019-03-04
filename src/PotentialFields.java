@@ -14,7 +14,7 @@ public class PotentialFields {
 	//------------//
 	// Attributes //
 	//------------//
-	
+
 	private final EasyGui gui;
     private  EasyGui newGUI;
 
@@ -114,7 +114,7 @@ public class PotentialFields {
 		disArcId = gui.addButton(7, 4, "Euclidean", this, "disableArc");
 		gui.setButtonEnabled(disArcId, false);
 		ArcPlanner = false;
-		
+
 		// More options
 		gui.addLabel(7, 5, "Arc drawing: ");
 		enArcDrawingId = gui.addButton(7, 6, "Arcs", this, "enableArcDrawing");
@@ -136,11 +136,13 @@ public class PotentialFields {
 		easyCourseId = gui.addButton(3, 1, "Easy", this, "easyCourse");
 		medCourseId = gui.addButton(3, 2, "Medium", this, "medCourse");
 		hardCourseId = gui.addButton(3, 3, "Hard", this, "hardCourse");
-                newobsticalShape  = gui.addButton(3,4 , "5-point obstacle ", this, "newobsticalShape");   
+        newobsticalShape  = gui.addButton(3,4 , "5-point obstacle ", this, "newobsticalShape");   
+
 
 		// Custom obstacles
 		gui.addLabel(4, 0, "Or add in your own obstacles: ");
 		circleSId = gui.addButton(4, 1, "Circle (S)", this, "genCircleS");
+
 
 		circleLId = gui.addButton(4, 2, "Circle (L)", this, "genCircleL");
 		squareSId = gui.addButton(4, 3, "Square (S)", this, "genSquareS");
@@ -161,23 +163,26 @@ public class PotentialFields {
 	//---------//
 
 	// Control:
-	
+
 	public void runRobot() {
 		gui.show();
 	}
-	
+
+
 	public void pause() {
 		stop = !stop;
 		setButtons(stop);
 	}
-	
+
+
 	public void quit() {
 		gui.hide();
 		System.exit(0);
 	}
 
-	// Mike:
-	
+
+	// Mike mode:
+
 	public void enableMike() {
 		setMike(true);
 	}
@@ -191,7 +196,7 @@ public class PotentialFields {
 		gui.setButtonEnabled(enMikeId, !mike);
 		gui.setButtonEnabled(disMikeId, mike);
 	}
-	
+
 	public void enableArcDrawing() {
 		setArcDrawing(true);
 	}
@@ -205,7 +210,7 @@ public class PotentialFields {
 		gui.setButtonEnabled(enArcDrawingId, !arcs);
 		gui.setButtonEnabled(disArcDrawingId, arcs);
 	}
-	
+
 	
 	public void enableArc() {
 		setArcPlanner(true);
@@ -221,6 +226,7 @@ public class PotentialFields {
 		gui.setButtonEnabled(disArcId, planar);
 	}
 
+
 	/**
 	 * Action when 'clear fields' button is pressed - reset all text fields in the GUI.
 	 **/
@@ -235,6 +241,8 @@ public class PotentialFields {
 		gui.setTextFieldContent(robotSensorDensityId, "");
 		gui.setTextFieldContent(robotSpeedId, "");
 	}
+
+
 
 	// Pre-made courses:
 	
@@ -267,75 +275,67 @@ public class PotentialFields {
 		gui.draw(obstacles);
 		gui.update();
 	}
-        
-        
-        public  void  newobsticalShape (){
-             newGUI = new EasyGui(100, 100);
-            newGUI.addLabel(0, 0, "Enter the coordinates of the five points : ");
-            
-             newGUI.addLabel(1, 0, "Point1 X  : ");
-             
-              x1newID = newGUI.addTextField(1, 1, null);
-             newGUI.addLabel(1, 2, "Point1 Y  : ");
-              y1newID = newGUI.addTextField(1, 3, null);
-             
-             newGUI.addLabel(2, 0, "Point2 X  : ");
-              x2newID = newGUI.addTextField(2, 1, null);
-             newGUI.addLabel(2, 2, "Point2 Y  : ");
-             y2newID = newGUI.addTextField(2, 3, null);
-             
-             
-             newGUI.addLabel(3, 0, "Point3 X  : ");
-              x3newID = newGUI.addTextField(3, 1, null);
-             newGUI.addLabel(3, 2, "Point3 Y  : ");
-             y3newID = newGUI.addTextField(3, 3, null);
-             
-             newGUI.addLabel(4, 0, "Point4 X  : ");
-              x4newID = newGUI.addTextField(4, 1, null);
-             newGUI.addLabel(4, 2, "Point4 Y  : ");
-             y4newID = newGUI.addTextField(4, 3, null);
-             
-             newGUI.addLabel(5, 0, "Point5 X  : ");
-              x5newID = newGUI.addTextField(5, 1, null);
-             newGUI.addLabel(5, 2, "Point5 Y  : ");
-             y5newID = newGUI.addTextField(5, 3, null);
-             
-             messageLabel =  newGUI.addLabel(6, 0, "   ");
 
-		 buttonIdNEW = newGUI.addButton(7, 1, "done", this, "createObstical");
-                 
-                 newGUI.show() ;  
-		
 
-            
-            
-        } 
-        public  static  boolean   getPoints   ( Vector []  points , String...  numberString   )
-        {
-            boolean  isNumberAll   =   true  ; 
-            
-            for  ( int  i = 0 ;   i < numberString.length-1  ;  i = i +2  )
-            {
-               
-                try{
-                   points[i/2]  = new Vector (Integer.parseInt(numberString[i])  , Integer.parseInt(numberString[i+1]));
-                    
-                }
-                    
-                catch ( Exception e  )
-                { 
-                    System.out.println(  "e" + e );
-                    return false ; 
-                }
+    public void newobsticalShape() {
+	    newGUI = new EasyGui(100, 100);
+	    newGUI.addLabel(0, 0, "Enter the coordinates of the five points : ");
+
+	    newGUI.addLabel(1, 0, "Point1 X  : ");
+ 
+	    x1newID = newGUI.addTextField(1, 1, null);
+	    newGUI.addLabel(1, 2, "Point1 Y  : ");
+	    y1newID = newGUI.addTextField(1, 3, null);
+	     
+	    newGUI.addLabel(2, 0, "Point2 X  : ");
+	    x2newID = newGUI.addTextField(2, 1, null);
+	    newGUI.addLabel(2, 2, "Point2 Y  : ");
+	    y2newID = newGUI.addTextField(2, 3, null);
+
+
+	    newGUI.addLabel(3, 0, "Point3 X  : ");
+	    x3newID = newGUI.addTextField(3, 1, null);
+	    newGUI.addLabel(3, 2, "Point3 Y  : ");
+	    y3newID = newGUI.addTextField(3, 3, null);
+
+	    newGUI.addLabel(4, 0, "Point4 X  : ");
+	    x4newID = newGUI.addTextField(4, 1, null);
+	    newGUI.addLabel(4, 2, "Point4 Y  : ");
+	    y4newID = newGUI.addTextField(4, 3, null);
+
+	    newGUI.addLabel(5, 0, "Point5 X  : ");
+	    x5newID = newGUI.addTextField(5, 1, null);
+	    newGUI.addLabel(5, 2, "Point5 Y  : ");
+	    y5newID = newGUI.addTextField(5, 3, null);
+
+	    messageLabel =  newGUI.addLabel(6, 0, "   ");
+
+		buttonIdNEW = newGUI.addButton(7, 1, "done", this, "createObstical");
+        newGUI.show();
+
+    }
+
+
+    public  static  boolean   getPoints   ( Vector []  points , String...  numberString   ) {
+        boolean  isNumberAll   =   true  ; 
+
+        for (int i = 0; i < numberString.length-1; i = i + 2) {
+            try {
+               points[i/2]  = new Vector (Integer.parseInt(numberString[i])  , Integer.parseInt(numberString[i+1]));
+            } catch (Exception e) { 
+                System.out.println(  "e" + e );
+                return false ; 
             }
-            
-            return isNumberAll ;  
-            
         }
-        public void createObstical () 
-        {
-            String []   allVals  =  new String [10 ] ; 
-           allVals[0] = newGUI.getTextFieldContent(x1newID);
+
+        return isNumberAll;
+    }
+
+
+    public void createObstical () {
+        String[] allVals = new String [10];
+
+        allVals[0] = newGUI.getTextFieldContent(x1newID);
 		allVals[1] = newGUI .getTextFieldContent(y1newID);
 		allVals[2] = newGUI.getTextFieldContent(x2newID);
 		allVals[3] = newGUI.getTextFieldContent(y2newID);
@@ -344,38 +344,36 @@ public class PotentialFields {
 		allVals[6] = newGUI.getTextFieldContent(x4newID);
 		allVals[7] = newGUI.getTextFieldContent(y4newID);
 		allVals[8]= newGUI.getTextFieldContent(x5newID); 
-                allVals[9] = newGUI.getTextFieldContent(y5newID); 
-                 Vector points  []  =  new  Vector  [ 5 ]; 
-                 
-                 boolean success  = getPoints   ( points ,allVals  );
-                 
-                 if( ! success  )
-                 {newGUI.setLabelText(messageLabel, "All Field should be integers");
-                 return ; 
-                 }
+        allVals[9] = newGUI.getTextFieldContent(y5newID);
+
+	    Vector points  []  =  new  Vector  [ 5 ]; 
+
+	    boolean success  = getPoints   ( points ,allVals  );
+	
+	
+	    if (!success) {
+	    	newGUI.setLabelText(messageLabel, "All Field should be integers");
+	     	return;
+	    }
                    
                  
-                 RenderablePolyline line = new RenderablePolyline();
+        RenderablePolyline line = new RenderablePolyline();
+
 		int[][] linePoints = { { (int)points[0].x, (int)points[0].y }, { (int)points[1].x, (int)points[1].y }, { (int)points[2].x, (int)points[2].y }, { (int)points[3].x, (int)points[3].y }, {(int) points[4].x, (int)points[4].y } };
+
+
 		for (int[] p : linePoints) 
 			line.addPoint(p[0], p[1]);
-		
+
 		line.setProperties(Color.DARK_GRAY, 2f);
 		setupObstacle(line);
-                
-                newGUI.hide();
-                
-                     
-                 
-                 
-                
-                
-                
-                
-               // if (  )
-                
-                
-        }
+
+        newGUI.hide();
+
+        // if (  )
+    }
+
+
 	/**
 	 * Set up the 'hard' pre-made course
 	 */
@@ -393,13 +391,16 @@ public class PotentialFields {
 
 		RenderablePolyline line = new RenderablePolyline();
 		int[][] linePoints = { { 800, 700 }, { 800, 900 }, { 1300, 800 }, { 1400, 300 }, { 1200, 350 } };
+
 		for (int[] p : linePoints) {
 			line.addPoint(p[0], p[1]);
 		}
+
 		line.setProperties(Color.DARK_GRAY, 2f);
 		setupObstacle(line);
 	}
-	
+
+
 	/**
 	 * Set up initial robot position.
 	 */
@@ -408,6 +409,7 @@ public class PotentialFields {
 		gui.setTextFieldContent(startYId, y);
 	}
 
+
 	/**
 	 * Set up goal position.
 	 */
@@ -415,6 +417,7 @@ public class PotentialFields {
 		gui.setTextFieldContent(goalXId, x);
 		gui.setTextFieldContent(goalYId, y);
 	}
+
 
 	private void setObstacles(int[][] params) {
 		for (int[] square : params) {
@@ -438,13 +441,15 @@ public class PotentialFields {
 	public void genCircleL() {
 		genCircle(150, 150);
 	}
-	
+
+
 	private void genCircle(int width, int height) {
 		IntPoint centre = randomPoint(frameLength, frameHeight);
 		RenderableOval o = new RenderableOval(centre.x, centre.y, width, height);
 		o.setProperties(Color.MAGENTA, 1f, true);
 		setupObstacle(o);
 	}
+
 
 	public void genSquareS() {
 		IntPoint origin = randomPoint(frameLength - 50, frameHeight - 5);
@@ -469,7 +474,8 @@ public class PotentialFields {
 		p.setProperties(Color.ORANGE, 2f);
 		setupObstacle(p);
 	}
-	
+
+
 	/**
 	 * Generate a random point in 2D space in the range ([0-maxX,], [0-maxY]) for
 	 * obstacle creation
@@ -482,6 +488,7 @@ public class PotentialFields {
 		return point;
 	}
 
+
 	/**
 	 * Clear all obstacles from the screen
 	 **/
@@ -491,11 +498,13 @@ public class PotentialFields {
 		gui.update();
 	}
 
+
 	private int getProp(String var, Random rand, int randParam) {
 		if (var.isEmpty())
 			return rand.nextInt(randParam);
 		return Integer.parseInt(var);
 	}
+
 
 	/**
 	 * Get the parameters from the text fields and use these to set the robot moving
@@ -505,6 +514,7 @@ public class PotentialFields {
 		int robotSensorDensity, robotSpeed, power, box, goal;
 
 		Random rand = new Random();
+
 		String startXs = gui.getTextFieldContent(startXId);
 		String startYs = gui.getTextFieldContent(startYId);
 		String goalXs = gui.getTextFieldContent(goalXId);
@@ -518,81 +528,88 @@ public class PotentialFields {
 //		String powers = gui.getTextFieldContent(powerId);
 //		String boxes = gui.getTextFieldContent(boxId);
 //		String goals = gui.getTextFieldContent(goalId);
-//                
-                
-       String headingStr =  gui.getTextFieldContent(headingR);
-       double headingD = 0.0 ;
-
-       if (! headingStr.isEmpty()) 
-    	   headingD =  Double.parseDouble ( headingStr);
-       gui.setTextFieldContent(headingR, "" + headingD);
 
 
-       startX = getProp(startXs, rand, frameLength);
-       gui.setTextFieldContent(startXId, "" + startX);
-
-       startY = getProp(startYs, rand, frameHeight);
-       gui.setTextFieldContent(startYId, "" + startY);
-
-       goalX = getProp(goalXs, rand, frameLength);
-       gui.setTextFieldContent(goalXId, "" + goalX);
-
-       goalY = getProp(goalYs, rand, frameHeight);
-       gui.setTextFieldContent(goalYId, "" + goalY);
+        String headingStr =  gui.getTextFieldContent(headingR);
+        double headingD = 0.0 ;
 
 
-       if (radiuss.isEmpty())
-    	   radius = rand.nextInt(70) + 30; // Radius is between 30 and 100
-       else
-    	   radius = Integer.parseInt(radiuss);
-
-       gui.setTextFieldContent(goalRadiusId, "" + radius);
+        if (! headingStr.isEmpty()) 
+    	    headingD =  Double.parseDouble ( headingStr);
+        gui.setTextFieldContent(headingR, "" + headingD);
 
 
-       if (robotRadiuss.isEmpty())
-    	   robotRadius = rand.nextInt(20) + 20; // Robot radius between 20 and 40
-       else
-    	   robotRadius = Integer.parseInt(robotRadiuss);
-       gui.setTextFieldContent(robotRadiusId, "" + robotRadius);
+        startX = getProp(startXs, rand, frameLength);
+        gui.setTextFieldContent(startXId, "" + startX);
+
+        startY = getProp(startYs, rand, frameHeight);
+        gui.setTextFieldContent(startYId, "" + startY);
+
+        goalX = getProp(goalXs, rand, frameLength);
+        gui.setTextFieldContent(goalXId, "" + goalX);
+
+        goalY = getProp(goalYs, rand, frameHeight);
+        gui.setTextFieldContent(goalYId, "" + goalY);
 
 
-       if (robotSensorRanges.isEmpty())
-    	   robotSensorRange = rand.nextInt(300) + 100; // between 50 and 200
-       else
-    	   robotSensorRange = Integer.parseInt(robotSensorRanges);
+        if (radiuss.isEmpty())
+    	    radius = rand.nextInt(70) + 30; // Radius is between 30 and 100
+        else
+    	    radius = Integer.parseInt(radiuss);
 
-       gui.setTextFieldContent(robotSensorRangeId, "" + robotSensorRange);
-
-       if (robotSensorDensitys.isEmpty())
-    	   robotSensorDensity = rand.nextInt(175) + 5; // between 5 and 180
-       else
-    	   robotSensorDensity = Integer.parseInt(robotSensorDensitys);
-       gui.setTextFieldContent(robotSensorDensityId, "" + robotSensorDensity);
-
-       if (robotSpeeds.isEmpty())
-    	   robotSpeed = 40; // Default speed is 40 moves per second
-       else
-    	   robotSpeed = Integer.parseInt(robotSpeeds);
-       gui.setTextFieldContent(robotSpeedId, "" + robotSpeed);
-
-       if (robotSpeeds.isEmpty())
-    	   robotSpeed = 40; // Default speed is 40 moves per second
-       else
-    	   robotSpeed = Integer.parseInt(robotSpeeds);
-       gui.setTextFieldContent(robotSpeedId, "" + robotSpeed);
+        gui.setTextFieldContent(goalRadiusId, "" + radius);
 
 
-       String image = mike ? "mike.png" : null;
+        if (robotRadiuss.isEmpty())
+    	    robotRadius = rand.nextInt(20) + 20; // Robot radius between 20 and 40
+        else
+    	    robotRadius = Integer.parseInt(robotRadiuss);
 
-       goLittleRobot(new IntPoint(startX, startY), new IntPoint(goalX, goalY), radius, robotRadius, robotSensorRange,
-    		   robotSensorDensity, robotSpeed, image, /*power, goal, box,*/headingD );
+        gui.setTextFieldContent(robotRadiusId, "" + robotRadius);
+
+
+        if (robotSensorRanges.isEmpty())
+    	    robotSensorRange = rand.nextInt(300) + 100; // between 50 and 200
+        else
+    	    robotSensorRange = Integer.parseInt(robotSensorRanges);
+
+        gui.setTextFieldContent(robotSensorRangeId, "" + robotSensorRange);
+
+
+        if (robotSensorDensitys.isEmpty())
+    	    robotSensorDensity = rand.nextInt(175) + 5; // between 5 and 180
+        else
+    	    robotSensorDensity = Integer.parseInt(robotSensorDensitys);
+        gui.setTextFieldContent(robotSensorDensityId, "" + robotSensorDensity);
+
+
+        if (robotSpeeds.isEmpty())
+    	    robotSpeed = 40; // Default speed is 40 moves per second
+        else
+    	    robotSpeed = Integer.parseInt(robotSpeeds);
+
+        gui.setTextFieldContent(robotSpeedId, "" + robotSpeed);
+
+
+        if (robotSpeeds.isEmpty())
+    	    robotSpeed = 40; // Default speed is 40 moves per second
+        else
+    	    robotSpeed = Integer.parseInt(robotSpeeds);
+
+        gui.setTextFieldContent(robotSpeedId, "" + robotSpeed);
+
+
+        String image = mike ? "mike.png" : null;
+
+        goLittleRobot(new IntPoint(startX, startY), new IntPoint(goalX, goalY), radius, robotRadius, robotSensorRange,
+    		    robotSensorDensity, robotSpeed, image, /*power, goal, box,*/headingD);
+
 	}
 
 
 	/**
-	 * Set the robot moving towards a goal on the screen with set radius, step size,
-	 * etc.
-	 * 
+	 * Set the robot moving towards a goal on the screen with set radius, step size, etc.
+	 *
 	 * @param start
 	 *            The coordinates of the starting point
 	 * @param goal
@@ -609,7 +626,9 @@ public class PotentialFields {
 	 *            The number of moves per second
 	 */
 	public void goLittleRobot(IntPoint start, IntPoint goal, int goalRad, int robotRadius, int robotSensorRange,
-			int robotSensorDensity, int robotSpeed, String image,/* int power, int goalFactor, int box ,*/ double headingR) throws InterruptedException {
+		int robotSensorDensity, int robotSpeed, String image,/* int power, int goalFactor, int box ,*/ double headingR) throws InterruptedException {
+
+		//TODO arguments!!
 
 		// Disable all buttons while robot is active TODO
 		setButtons(false);
@@ -620,17 +639,22 @@ public class PotentialFields {
 
 		RRTree startAndGoal = new RRTree(Color.black);
 		startAndGoal.setStartAndGoal(start, goal, goalRad);
+
 		RenderableString rs = null;
 		RenderableString rs2 = null;
+
 		RenderablePolyline path = new RenderablePolyline();
+
 		path.setProperties(Color.BLACK, 1f);
 		path.addPoint(start.x, start.y);
+
 
 		// Draw the initial set up
 		gui.clearGraphicsPanel();
 		gui.draw(startAndGoal);
 		gui.draw(path);
 		gui.draw(obstacles);
+
 		drawRobot(rob);
 		gui.update();
 
@@ -639,11 +663,11 @@ public class PotentialFields {
 
 		// Loop until the robot reaches the goal or gets stuck
 		while (!rob.inGoal()) {
+
 			do {
 				Thread.sleep(1000 / robotSpeed);
-			}
-			while (stop);
-			
+			} while (stop);
+
 			boolean move = ArcPlanner ? rob.ArcMove() : rob.move(); // Move 1 step
 
 			// If robot has crashed:
@@ -665,17 +689,20 @@ public class PotentialFields {
 			gui.draw(obstacles);
 			drawRobot(rob);
 
-			// Draw movement arcs
-			if ( true /* ArcPlanner*/   ) {
-				drawArc(rob.getFirstArc(), Color.BLACK);
+			// draw the first arc
+			drawArc(rob.getFirstArc(), Color.BLACK);
 
-                if (!ArcPlanner && !arcs) {
-                	MyArc  newArc =  new MyArc(rob. getSecondArc().p1 ,  rob. getThirdArc().p2  ,rob. getSecondArc().startHeading , true );
-                    drawArc(newArc  , Color.PINK   ); 
-                } else {
-                    drawArc(rob.getSecondArc(), Color.PINK);
-                    drawArc(rob.getThirdArc(), Color.DARK_GRAY);
-                }
+			// Draw movement arcs
+			if (ArcPlanner) {
+
+                drawArc(rob.getSecondArc(), Color.PINK);
+                drawArc(rob.getThirdArc(), Color.DARK_GRAY);
+
+			} else {
+				if (!arcs) {
+					MyArc newArc = new MyArc(rob.getSecondArc().p1, rob.getThirdArc().p2, rob.getSecondArc().startHeading, true);
+                    drawArc(newArc, Color.PINK);
+				}
 			}
 
 
@@ -709,7 +736,8 @@ public class PotentialFields {
 	private void drawArc(MyArc arc, Color c) {
 		if (arc != null) {
             RenderablePolyline polyline = arc.getRenderablePolyline(arcs);
-                        
+
+            //TODO
 //			addVectorToLine(arc.getStartPoint(), polyline);
 //			addVectorToLine(arc.getEndPoint(), polyline);
 			polyline.setProperties(c, 5f);
