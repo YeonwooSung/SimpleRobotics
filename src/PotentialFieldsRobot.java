@@ -52,16 +52,16 @@ public class PotentialFieldsRobot {
 //	private final int visitedBoxSize;
 	
 	private boolean fractionalProgress;
-	
+
 	private final int VISITED_HISTOGRAM_LENGTH = 10000; //PotentialFields.frameLength / visitedBoxSize;
 	private final int VISITED_HISTOGRAM_HEIGHT = 10000; //PotentialFields.graphicsHeight / visitedBoxSize;
 
 	private final int[][] visitedHistogram = new int[VISITED_HISTOGRAM_LENGTH][VISITED_HISTOGRAM_HEIGHT];
-	
+
 	//-------------//
 	// Constructor //
 	//-------------//
-	
+
 	/**
 	 * Set the robot moving towards a goal on the screen with set radius, step size,
 	 * etc.
@@ -113,6 +113,7 @@ public class PotentialFieldsRobot {
 	public boolean ArcMove() {
 		IntPoint moveTo;
 
+		//TODO
 		if (this.fractionalProgress) {
 			moveTo = evaluateSamplePointsArcForFractionalProgress();
 		} else {
@@ -354,6 +355,7 @@ public class PotentialFieldsRobot {
 		}
 
 		int minIndex = minIndex(moveValues2);
+		int maxIndex = maxIndex(moveValues1);
 
 		return moves.get(minIndex);
 	}
@@ -812,6 +814,23 @@ public class PotentialFieldsRobot {
 		return minIndex;
 	}
 
+
+	/**
+	 * Gets the index of the maximum number in the given array.
+	 *
+	 * @param nums
+	 * @return
+	 */
+	int maxIndex(double[] nums) {
+		int index = 0;
+
+		for (int i = 1; i < nums.length; i++) {
+			if (nums[i] > nums[index])
+				index = i;
+		}
+
+		return index;
+	}
 
 	/**
 	 * Get the distance between two points.

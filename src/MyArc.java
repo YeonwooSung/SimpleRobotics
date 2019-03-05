@@ -83,6 +83,23 @@ class MyArc {
 	}
 
 
+	/**
+	 * The getter for p1, which is a start point of the arc.
+	 * @return p1
+	 */
+	public MyPoint getStartPoint() {
+		return p1;
+	}
+
+
+	/**
+	 * The getter for p2, which is end point of the arc.
+	 * @return p2
+	 */
+	public MyPoint getEndPoint() {
+		return p2;
+	}
+
 	/* compute signed angle */
 	private static double computeAngleDirected(MyPoint vector1, MyPoint vector2) {
 		double angle = Math.atan2(vector2.y, vector2.x) - Math.atan2(vector1.y, vector1.x);

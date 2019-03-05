@@ -51,6 +51,11 @@ public class RRT {
 	
 	private int goalBias;
 	private boolean geomMove;
+
+	//attributes for the fractional progress option
+	private boolean fractionalProgress;
+	private final int fractionalProgressID;
+	private final int nonFractionalProgressID;
 	
 	private ArrayList<Renderable> goalPathRender;
 
@@ -114,9 +119,15 @@ public class RRT {
 		squareLId = gui.addButton(4, 4, "Square (L)", this, "genSquareL");
 		randomLineId = gui.addButton(4, 5, "Line", this, "genLine");
 		clearObsId = gui.addButton(4, 6, "Clear Obstacles", this, "clearObs");
-		
+
 		gui.addButton(4, 8, "Quit", this, "quit");
 		
+
+		// add buttons for the fractional progress
+		fractionalProgressID = gui.addButton(4, 8, "Fractional Progress", this, "enableFractionalProgress");
+		nonFractionalProgressID = gui.addButton(5, 8, "Default mode", this, "disableFractionalProgress");
+		this.setFractionalProgress(false);
+
 		obstacles = new ArrayList<Renderable>();
 
 	}
@@ -164,6 +175,25 @@ public class RRT {
 		gui.hide();
 		System.exit(0);
 	}
+
+
+	// Fractional progress:
+
+	private void setFractionalProgress(boolean fractionalProgress) {
+		this.fractionalProgress = fractionalProgress;
+
+		gui.setButtonEnabled(fractionalProgressID, !fractionalProgress);
+		gui.setButtonEnabled(nonFractionalProgressID, fractionalProgress);
+	}
+
+	public void enableFractionalProgress() {
+		this.setFractionalProgress(true);
+	}
+
+	public void disableFractionalProgress() {
+		this.setFractionalProgress(false);
+	}
+
 
 
 	/**
@@ -568,8 +598,7 @@ public class RRT {
 
 
 		//Now make a robot and have him follow the path 
-		PotentialFieldsRobot rob = new PotentialFieldsRobot(null, start, goal, robotRadius, 200, 90, 2*robotRadius+50, obstacles , 0, false);
-		//TODO in the constructor of PotentialFieldsRobot, the last value (fractional progress) is false -> need to handle it later!!
+		PotentialFieldsRobot rob = new PotentialFieldsRobot(null, start, goal, robotRadius, 200, 90, 2*robotRadius+50, obstacles , 0, this.fractionalProgress);
 
 		double headingR = rob.calculateHeading(goal);
 
@@ -583,7 +612,7 @@ public class RRT {
 		goalPath.add(goal);
 
 
-		int l =0;
+		int l = 0;
 
 		for(int i=0;i<goalPath.size();i++) {
 			rob.setGoal(goalPath.get(i));

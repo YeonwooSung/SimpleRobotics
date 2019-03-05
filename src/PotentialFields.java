@@ -3,6 +3,7 @@ import java.awt.Font;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.Random;
+
 import renderables.*;
 import dataStructures.RRTree;
 import easyGui.EasyGui;
@@ -59,7 +60,7 @@ public class PotentialFields {
 	private boolean mike;
 	private boolean ArcPlanner;
     private final int headingR;
-    
+
     private boolean fractionalProgress;
 
 	static final int frameLength = 1200;
@@ -620,14 +621,6 @@ public class PotentialFields {
         gui.setTextFieldContent(robotSpeedId, "" + robotSpeed);
 
 
-        if (robotSpeeds.isEmpty())
-    	    robotSpeed = 40; // Default speed is 40 moves per second
-        else
-    	    robotSpeed = Integer.parseInt(robotSpeeds);
-
-        gui.setTextFieldContent(robotSpeedId, "" + robotSpeed);
-
-
         String image = mike ? "mike.png" : null;
 
         goLittleRobot(new IntPoint(startX, startY), new IntPoint(goalX, goalY), radius, robotRadius, robotSensorRange,
@@ -752,7 +745,9 @@ public class PotentialFields {
 			gui.draw(rs2);
 
 			gui.update();
-		}
+
+		} //while loop ends here
+
 
 		// Print metrics to console
 		System.out.println("Distance Travelled (pixels): " + l);
@@ -761,6 +756,7 @@ public class PotentialFields {
 		// Re-enable buttons when finished
 		setButtons(true);
 	}
+
 
 	private void drawArc(MyArc arc, Color c) {
 		if (arc != null) {
@@ -773,6 +769,12 @@ public class PotentialFields {
 			gui.draw(polyline);
 		}
 
+	}
+
+
+	private void addVectorToLine(MyPoint startPoint, RenderablePolyline polyline) {
+		// TODO Auto-generated method stub
+		polyline.addPoint((int)startPoint.x, (int)startPoint.y);
 	}
 
 
