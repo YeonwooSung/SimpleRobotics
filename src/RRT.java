@@ -568,7 +568,8 @@ public class RRT {
 
 
 		//Now make a robot and have him follow the path 
-		PotentialFieldsRobot rob = new PotentialFieldsRobot(null, start, goal, robotRadius, 200, 90, 2*robotRadius+50, obstacles , 0 );
+		PotentialFieldsRobot rob = new PotentialFieldsRobot(null, start, goal, robotRadius, 200, 90, 2*robotRadius+50, obstacles , 0, false);
+		//TODO in the constructor of PotentialFieldsRobot, the last value (fractional progress) is false -> need to handle it later!!
 
 		double headingR = rob.calculateHeading(goal);
 

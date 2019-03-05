@@ -82,12 +82,13 @@ class MyArc {
 
 	}
 
-	/* compute signed angle */
 
+	/* compute signed angle */
 	private static double computeAngleDirected(MyPoint vector1, MyPoint vector2) {
 		double angle = Math.atan2(vector2.y, vector2.x) - Math.atan2(vector1.y, vector1.x);
 		return angle;
 	}
+
 
 	/* rotate P1 by angle */
 	private static MyPoint rotate(MyPoint P1, double angle) {
@@ -186,6 +187,7 @@ class MyArc {
 		return arc1x;
 	}
 
+
 	/* get the points on the arc -anti clockwise- */
 	private static List<MyPoint> forwardOrder(double raduis, MyPoint center1, MyPoint point1, MyPoint point2,
 			double heading, double step, boolean small) {
@@ -273,6 +275,7 @@ class MyArc {
 		return arc1x;
 	}
 
+
 	/* get the points on the arc */
 	private static List<MyPoint> ArcDrawing(MyPoint p1, MyPoint p2, MyPoint center1, double raduis, double step,
 			double startHeading, boolean small) {
@@ -312,6 +315,7 @@ class MyArc {
 
 	}
 
+
 	/* compute unsigned angle */
 	private static double computeAngle(MyPoint V1, MyPoint V2) {
 		double dotProduct = V1.x * V2.x + V1.y * V2.y;
@@ -326,11 +330,10 @@ class MyArc {
 
 	}
 
-	/*
-	 * find the circle center for the arc .
-	 * 
-	 */
 
+	/*
+	 * find the circle center for the arc.
+	 */
 	private static MyPoint circleCenter(MyPoint p1, MyPoint p2, double startHeading, double radius) {
 
 		MyPoint VectorFromP1TpP2 = new MyPoint(p2.x - p1.x, p2.y - p1.y);
@@ -338,6 +341,7 @@ class MyArc {
 		double distance = p1.distance(p2);
 		double Angle = computeAngle(VectorFromP1TpP2, headingVector);
 		MyPoint c1;
+
 		// if the angle between the two vectors is 90 degress then the circle
 		// center is between P1 and P2
 		if (Angle == Math.PI / 2.0) {

@@ -23,7 +23,7 @@ public class PotentialFieldsRobot {
 	// Sensor:
 	private final int sensorRange; // Range of sensors
 	private final int sensorDensity; // Number of 'lines' the robot uses to see
-	
+
 	// Goal:
 	private IntPoint goal;
 	private int goalRadius;
@@ -51,6 +51,8 @@ public class PotentialFieldsRobot {
 //	private final int goalScoreFactor;
 //	private final int visitedBoxSize;
 	
+	private boolean fractionalProgress;
+	
 	private final int VISITED_HISTOGRAM_LENGTH = 10000; //PotentialFields.frameLength / visitedBoxSize;
 	private final int VISITED_HISTOGRAM_HEIGHT = 10000; //PotentialFields.graphicsHeight / visitedBoxSize;
 
@@ -74,7 +76,7 @@ public class PotentialFieldsRobot {
 	 * @param obstacles a list of all the obstacles on the map
 	 */
 	public PotentialFieldsRobot(String imagePath, IntPoint startingLocation, IntPoint goalLocation, int radius,
-			int sensorRange, int sensorDensity, int goalRadius, List<Renderable> obstacles,/* int power, int goal, int box,*/double headingR) {
+			int sensorRange, int sensorDensity, int goalRadius, List<Renderable> obstacles,/* int power, int goal, int box,*/double headingR, boolean fractionalProgress) {
 		if (imagePath == null) {
 			robotPic = null;
 			robotPicAlt = new RenderablePoint(startingLocation.x, startingLocation.y);
@@ -87,6 +89,9 @@ public class PotentialFieldsRobot {
 
 		this.coords = new IntPoint(startingLocation.x, startingLocation.y);
         heading = headingR;
+
+        // set the boolean value for the fractional progress
+        this.fractionalProgress = fractionalProgress;
 
 
 		this.radius = radius;
@@ -101,12 +106,20 @@ public class PotentialFieldsRobot {
 
 
 	/**
-	 * arc planner  move method.
+	 * The move method of the arc planner.
 	 * 
 	 * @return True if the move is successful, false if there are no viable moves.
 	 **/
-	public boolean ArcMove () {
-		IntPoint moveTo = evaluateSamplePointsArc(); // Pick a sample point to move towards
+	public boolean ArcMove() {
+		IntPoint moveTo;
+
+		if (this.fractionalProgress) {
+			moveTo = evaluateSamplePointsArcForFractionalProgress();
+		} else {
+			moveTo = evaluateSamplePointsArc(); // Pick a sample point to move towards
+		}
+
+
 		if (moveTo == null)
 			return false;
 
@@ -136,7 +149,7 @@ public class PotentialFieldsRobot {
 	 * @param moveTo sample point we want to move to
 	 * @return 3 arcs system.
 	 */
-	private ArcSet get3Arcs(IntPoint moveTo ,boolean draw ) {
+	private ArcSet get3Arcs(IntPoint moveTo, boolean draw) {
 		Vector robotPos = new Vector(coords.x, coords.y);
 		Vector samplePos = new Vector(moveTo.x, moveTo.y);
 		Vector goalPos = new Vector(goal.x, goal.y);
@@ -240,9 +253,8 @@ public class PotentialFieldsRobot {
 
 
 	/**
-	 * Get the potential field at point p. The lower the value returned, the better
-	 * the point is as a move.
-	 * 
+	 * Get the potential field at point p. The lower the value returned, the better the point is as a move.
+	 *
 	 * @param p the point to evaluate
 	 * @return The value of the point
 	 */
@@ -250,7 +262,7 @@ public class PotentialFieldsRobot {
 		ArcSet arcs = get3Arcs(p, false);
 
 		// Everything is divided by 10 because otherwise the numbers get too big
-		double goalDist = (arcs.firstArc.arcLength +arcs.secondArc.arcLength + arcs.thirdArc.arcLength - radius) / 100;
+		double goalDist = (arcs.getTotalLengthOfArcs() - radius) / 100;
 
 		double[] obsDists = new double[visibleObstacles.size()];
 
@@ -310,11 +322,50 @@ public class PotentialFieldsRobot {
 	}
 
 
+	//TODO --------------------------------------------------------------------------------
+
+	private IntPoint evaluateSamplePointsArcForFractionalProgress() {
+		List<IntPoint> moves = getSamplePoints();
+
+		// If there's no moves that doesn't go through obstacles, quit
+		if (moves.isEmpty()) {
+			return null;
+		}
+
+		// An array to store the values of p/(p+f)
+		double[] moveValues1 = new double[moves.size()];
+
+		// An array to store the values of f/(p+f)
+		double[] moveValues2 = new double[moves.size()];
+
+		for (int i = 0; i < moves.size(); i++) {
+			IntPoint samplePoint = moves.get(i);
+
+			ArcSet set = get3Arcs(samplePoint, false);
+
+			double p = set.firstArc.arcLength;
+
+			double f = set.getTotalLengthOfArcs() + getObstaclePotential(samplePoint);
+
+			double sum = p + f;
+
+			moveValues1[i] = p / (sum);
+			moveValues2[i] = f / (sum);
+		}
+
+		int minIndex = minIndex(moveValues2);
+
+		return moves.get(minIndex);
+	}
+	
+	//TODO -------------------------------------------------------------------------------- 
+
+
 	/**
 	 * Move the robot 1 step towards the goal (point of least potential resistance)
 	 * 
 	 * @return True if the move is successful, false if there are no viable moves.
-	 **/
+	 */
 	public boolean move () {
 		IntPoint moveTo = evaluateSamplePoints(); // Pick a sample point to move towards
 		if (moveTo == null)
@@ -745,8 +796,11 @@ public class PotentialFieldsRobot {
 
 
 	/**
-	 * Get the position of the minimum value in the array
-	 **/
+	 * Get the position of the minimum value in the array.
+	 *
+	 * @param nums A list of numbers
+	 * @return The index of the minimum number in the list.
+	 */
 	private int minIndex(double[] nums) {
 		int minIndex = 0;
 
@@ -879,6 +933,14 @@ public class PotentialFieldsRobot {
 			firstArc = f;
 			secondArc = s;
 			thirdArc = t;
+		}
+
+		/**
+		 * This method returns to total length of the 3 arcs.
+		 * @return the total length of the 3 arcs
+		 */
+		public double getTotalLengthOfArcs() {
+			return firstArc.arcLength + secondArc.arcLength + thirdArc.arcLength;
 		}
 	}
         

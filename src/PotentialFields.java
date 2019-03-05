@@ -7,7 +7,6 @@ import renderables.*;
 import dataStructures.RRTree;
 import easyGui.EasyGui;
 import geometry.IntPoint;
-import java.util.List;
 
 public class PotentialFields {
 	
@@ -41,6 +40,8 @@ public class PotentialFields {
 	private final int disArcDrawingId;
 	private final int enArcId;
 	private final int disArcId;
+	private final int fractionalProgressID;
+	private final int nonFractionalProgressID;
 	//private final int powerId;
 	//private final int goalId;
 	//private final int boxId;
@@ -56,13 +57,15 @@ public class PotentialFields {
 	private final int robotSpeedId;
 	private boolean arcs;
 	private boolean mike;
-	private boolean ArcPlanner ;
-    private final int headingR  ;
+	private boolean ArcPlanner;
+    private final int headingR;
+    
+    private boolean fractionalProgress;
 
 	static final int frameLength = 1200;
 	static final int frameHeight = 900;
 	static final int graphicsHeight = 700;
-	
+
 	private ArrayList<Renderable> obstacles;
 
 	private boolean stop;
@@ -154,6 +157,12 @@ public class PotentialFields {
 		gui.addButton(6, 8, "Quit", this, "quit");
 
 
+		// add buttons for the fractional progress
+		fractionalProgressID = gui.addButton(4, 8, "Fractional Progress", this, "enableFractionalProgress");
+		nonFractionalProgressID = gui.addButton(5, 8, "Default mode", this, "disableFractionalProgress");
+		this.setFractionalProgress(false);
+
+
 		obstacles = new ArrayList<Renderable>();
 	}
 
@@ -211,7 +220,7 @@ public class PotentialFields {
 		gui.setButtonEnabled(disArcDrawingId, arcs);
 	}
 
-	
+
 	public void enableArc() {
 		setArcPlanner(true);
 	}
@@ -225,6 +234,26 @@ public class PotentialFields {
 		gui.setButtonEnabled(enArcId, !planar);
 		gui.setButtonEnabled(disArcId, planar);
 	}
+
+
+
+	// Fractional progress:
+	
+	private void setFractionalProgress(boolean fractionalProgress) {
+		this.fractionalProgress = fractionalProgress;
+
+		gui.setButtonEnabled(fractionalProgressID, !fractionalProgress);
+		gui.setButtonEnabled(nonFractionalProgressID, fractionalProgress);
+	}
+
+	public void enableFractionalProgress() {
+		this.setFractionalProgress(true);
+	}
+
+	public void disableFractionalProgress() {
+		this.setFractionalProgress(false);
+	}
+
 
 
 	/**
@@ -316,8 +345,8 @@ public class PotentialFields {
     }
 
 
-    public  static  boolean   getPoints   ( Vector []  points , String...  numberString   ) {
-        boolean  isNumberAll   =   true  ; 
+    public  static  boolean getPoints (Vector[] points, String... numberString) {
+        boolean isNumberAll = true; 
 
         for (int i = 0; i < numberString.length-1; i = i + 2) {
             try {
@@ -635,7 +664,7 @@ public class PotentialFields {
 		stop = false;
 
 		// Create the robot, start & end points, renderables
-		PotentialFieldsRobot rob = new PotentialFieldsRobot(image, start, goal, robotRadius, robotSensorRange, robotSensorDensity, goalRad, obstacles,/* power, goalFactor, box,*/headingR);
+		PotentialFieldsRobot rob = new PotentialFieldsRobot(image, start, goal, robotRadius, robotSensorRange, robotSensorDensity, goalRad, obstacles,/* power, goalFactor, box,*/headingR, this.fractionalProgress);
 
 		RRTree startAndGoal = new RRTree(Color.black);
 		startAndGoal.setStartAndGoal(start, goal, goalRad);
