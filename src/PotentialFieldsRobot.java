@@ -39,24 +39,25 @@ public class PotentialFieldsRobot {
 	// Image:
 	private final RenderableImg robotPic;
 	private final RenderablePoint robotPicAlt;
-	
+
 	// Arcs:
 	private MyArc firstArc;
 	private MyArc secondArc;
 	private MyArc thirdArc;
 		
 	//private Vector lastMove;
-	
+
 //	private final int vistedScorePower;
 //	private final int goalScoreFactor;
 //	private final int visitedBoxSize;
-	
+
 	private boolean fractionalProgress;
 
-	private final int VISITED_HISTOGRAM_LENGTH = 10000; //PotentialFields.frameLength / visitedBoxSize;
-	private final int VISITED_HISTOGRAM_HEIGHT = 10000; //PotentialFields.graphicsHeight / visitedBoxSize;
+	private final int VISITED_HISTOGRAM_LENGTH;
+	private final int VISITED_HISTOGRAM_HEIGHT;
 
-	private final int[][] visitedHistogram = new int[VISITED_HISTOGRAM_LENGTH][VISITED_HISTOGRAM_HEIGHT];
+	private final int[][] visitedHistogram;
+
 
 	//-------------//
 	// Constructor //
@@ -74,9 +75,12 @@ public class PotentialFieldsRobot {
 	 * @param sensorDensity the number of sensor lines the robot can use
 	 * @param goalRadius the width of the goal
 	 * @param obstacles a list of all the obstacles on the map
+	 * @param box The size of the box, which will be used for checking the visited histogram.
+	 * @param headingR
+	 * @param fractionalProgress
 	 */
 	public PotentialFieldsRobot(String imagePath, IntPoint startingLocation, IntPoint goalLocation, int radius,
-			int sensorRange, int sensorDensity, int goalRadius, List<Renderable> obstacles,/* int power, int goal, int box,*/double headingR, boolean fractionalProgress) {
+			int sensorRange, int sensorDensity, int goalRadius, List<Renderable> obstacles,/* int power, int goal,*/ int box, double headingR, boolean fractionalProgress) {
 		if (imagePath == null) {
 			robotPic = null;
 			robotPicAlt = new RenderablePoint(startingLocation.x, startingLocation.y);
@@ -102,6 +106,13 @@ public class PotentialFieldsRobot {
 		this.goalRadius = goalRadius;
 		this.obstacles = obstacles;
 
+
+		// visited histogram:
+
+		VISITED_HISTOGRAM_LENGTH = goalLocation.x / box;
+		VISITED_HISTOGRAM_HEIGHT = goalLocation.y / box;
+
+		this.visitedHistogram = new int[VISITED_HISTOGRAM_LENGTH][VISITED_HISTOGRAM_HEIGHT];
 	}
 
 
@@ -109,11 +120,10 @@ public class PotentialFieldsRobot {
 	 * The move method of the arc planner.
 	 * 
 	 * @return True if the move is successful, false if there are no viable moves.
-	 **/
+	 */
 	public boolean ArcMove() {
 		IntPoint moveTo;
 
-		//TODO
 		if (this.fractionalProgress) {
 			moveTo = evaluateSamplePointsArcForFractionalProgress();
 		} else {
@@ -128,6 +138,8 @@ public class PotentialFieldsRobot {
 
 		Vector robotPos = new Vector(coords.x, coords.y);
 		Vector samplePos = new Vector(moveTo.x, moveTo.y);
+
+		//TODO use visited histogram to set winding/unwinding
 
 		double theta = Calculator.getTheta(heading, robotPos, samplePos);
 
@@ -292,7 +304,7 @@ public class PotentialFieldsRobot {
 		}
 
 
-		double totalScore =10*goalField + Math.pow(2*radius,2)*4750*obsField / (sensorDensity*sensorRange);
+		double totalScore = 10 * goalField + Math.pow(2*radius,2)*4750*obsField / (sensorDensity*sensorRange);
 
 		return totalScore;
 	}
@@ -339,13 +351,16 @@ public class PotentialFieldsRobot {
 		// An array to store the values of f/(p+f)
 		double[] moveValues2 = new double[moves.size()];
 
+		// use for loop to get all IntPoint instances from the list.
 		for (int i = 0; i < moves.size(); i++) {
 			IntPoint samplePoint = moves.get(i);
 
 			ArcSet set = get3Arcs(samplePoint, false);
 
+			// p = the length of the first arc to the sample point
 			double p = set.firstArc.arcLength;
 
+			// f = total length of 3 arcs + obstacle potential
 			double f = set.getTotalLengthOfArcs() + getObstaclePotential(samplePoint);
 
 			double sum = p + f;

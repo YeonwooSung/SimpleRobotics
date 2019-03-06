@@ -43,9 +43,9 @@ public class PotentialFields {
 	private final int disArcId;
 	private final int fractionalProgressID;
 	private final int nonFractionalProgressID;
+	private final int boxId;
 	//private final int powerId;
 	//private final int goalId;
-	//private final int boxId;
 
 	private final int startXId;
 	private final int startYId;
@@ -162,6 +162,11 @@ public class PotentialFields {
 		fractionalProgressID = gui.addButton(4, 8, "Fractional Progress", this, "enableFractionalProgress");
 		nonFractionalProgressID = gui.addButton(5, 8, "Default mode", this, "disableFractionalProgress");
 		this.setFractionalProgress(false);
+
+
+		// add text field for the box size
+		gui.addLabel(2, 6, "Box Size:");
+		boxId = gui.addTextField(2, 7, null);
 
 
 		obstacles = new ArrayList<Renderable>();
@@ -554,9 +559,9 @@ public class PotentialFields {
 		String robotSensorRanges = gui.getTextFieldContent(robotSensorRangeId);
 		String robotSensorDensitys = gui.getTextFieldContent(robotSensorDensityId);
 		String robotSpeeds = gui.getTextFieldContent(robotSpeedId);
+		String boxes = gui.getTextFieldContent(boxId);
 
 //		String powers = gui.getTextFieldContent(powerId);
-//		String boxes = gui.getTextFieldContent(boxId);
 //		String goals = gui.getTextFieldContent(goalId);
 
 
@@ -621,10 +626,20 @@ public class PotentialFields {
         gui.setTextFieldContent(robotSpeedId, "" + robotSpeed);
 
 
+        // get and set the box size for the visited histogram
+        if (boxes.isEmpty()) {
+        	box = 500; //TODO check if the value is suitable
+        	gui.setTextFieldContent(boxId, "" + box);
+        } else {
+        	box = Integer.parseInt(boxes);
+        }
+
+
+        // string for the mike mode
         String image = mike ? "mike.png" : null;
 
         goLittleRobot(new IntPoint(startX, startY), new IntPoint(goalX, goalY), radius, robotRadius, robotSensorRange,
-    		    robotSensorDensity, robotSpeed, image, /*power, goal, box,*/headingD);
+    		    robotSensorDensity, robotSpeed, image, /*power, goal,*/ box, headingD);
 
 	}
 
@@ -646,9 +661,14 @@ public class PotentialFields {
 	 *            The number of sensor lines the robot can use
 	 * @param robotSpeed
 	 *            The number of moves per second
+	 * @param image
+	 *            The image string for the mike mode
+	 * @param box
+	 *            The box size for the visited histogram checking.
+	 * @param headingR
 	 */
 	public void goLittleRobot(IntPoint start, IntPoint goal, int goalRad, int robotRadius, int robotSensorRange,
-		int robotSensorDensity, int robotSpeed, String image,/* int power, int goalFactor, int box ,*/ double headingR) throws InterruptedException {
+		int robotSensorDensity, int robotSpeed, String image,/* int power, int goalFactor,*/ int box , double headingR) throws InterruptedException {
 
 		//TODO arguments!!
 
@@ -657,7 +677,7 @@ public class PotentialFields {
 		stop = false;
 
 		// Create the robot, start & end points, renderables
-		PotentialFieldsRobot rob = new PotentialFieldsRobot(image, start, goal, robotRadius, robotSensorRange, robotSensorDensity, goalRad, obstacles,/* power, goalFactor, box,*/headingR, this.fractionalProgress);
+		PotentialFieldsRobot rob = new PotentialFieldsRobot(image, start, goal, robotRadius, robotSensorRange, robotSensorDensity, goalRad, obstacles,/* power, goalFactor,*/ box,headingR, this.fractionalProgress);
 
 		RRTree startAndGoal = new RRTree(Color.black);
 		startAndGoal.setStartAndGoal(start, goal, goalRad);
