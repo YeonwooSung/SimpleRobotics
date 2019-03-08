@@ -76,8 +76,8 @@ public class PotentialFieldsRobot {
 	 * @param goalRadius the width of the goal
 	 * @param obstacles a list of all the obstacles on the map
 	 * @param box The size of the box, which will be used for checking the visited histogram.
-	 * @param headingR
-	 * @param fractionalProgress
+	 * @param headingR The initial heading.
+	 * @param fractionalProgress The boolean value for the fractional progress option.
 	 */
 	public PotentialFieldsRobot(String imagePath, IntPoint startingLocation, IntPoint goalLocation, int radius,
 			int sensorRange, int sensorDensity, int goalRadius, List<Renderable> obstacles,/* int power, int goal,*/ int box, double headingR, boolean fractionalProgress) {
@@ -109,8 +109,11 @@ public class PotentialFieldsRobot {
 
 		// visited histogram:
 
-		VISITED_HISTOGRAM_LENGTH = goalLocation.x / box;
-		VISITED_HISTOGRAM_HEIGHT = goalLocation.y / box;
+		int totalX = Math.abs(goalLocation.x - startingLocation.x);
+		int totalY = Math.abs(goalLocation.y - startingLocation.y);
+
+		VISITED_HISTOGRAM_LENGTH = totalX / box;
+		VISITED_HISTOGRAM_HEIGHT = totalY / box;
 
 		this.visitedHistogram = new int[VISITED_HISTOGRAM_LENGTH][VISITED_HISTOGRAM_HEIGHT];
 	}
@@ -214,7 +217,7 @@ public class PotentialFieldsRobot {
 
         double directedAngle3 = Calculator.getTheta(headingAtSamplex, new Vector( coords.x  ,coords.y ) ,new Vector(goal.x , goal.y)  )  /2.0; 
 
-        Vector Rotated =  new Vector (xAxis.x * Math.cos(headingAtSamplex+ directedAngle3  ) -xAxis.y* Math.sin(headingAtSamplex+ directedAngle3)     , xAxis.x * Math.sin(headingAtSamplex+ directedAngle3) +xAxis.y* Math.sin(headingAtSamplex+ directedAngle3)  );
+        Vector Rotated =  new Vector (xAxis.x * Math.cos(headingAtSamplex+ directedAngle3  ) -xAxis.y* Math.sin(headingAtSamplex+ directedAngle3)     , xAxis.x * Math.sin(headingAtSamplex+ directedAngle3) +xAxis.y* Math.sin(headingAtSamplex+ directedAngle3));
         Vector posV  =  samplePos.add(  Rotated );  
    
         return posV;

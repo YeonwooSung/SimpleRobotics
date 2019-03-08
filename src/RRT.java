@@ -598,7 +598,7 @@ public class RRT {
 
 
 		//Now make a robot and have him follow the path 
-		PotentialFieldsRobot rob = new PotentialFieldsRobot(null, start, goal, robotRadius, 200, 90, 2*robotRadius+50, obstacles , 0, this.fractionalProgress);
+		PotentialFieldsRobot rob = new PotentialFieldsRobot(null, start, goal, robotRadius, 200, 90, 2*robotRadius+50, obstacles, 500, 0, this.fractionalProgress);
 
 		double headingR = rob.calculateHeading(goal);
 
