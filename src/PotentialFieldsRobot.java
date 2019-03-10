@@ -24,14 +24,17 @@ public class PotentialFieldsRobot {
 	private final int sensorRange; // Range of sensors
 	private final int sensorDensity; // Number of 'lines' the robot uses to see
 
+	// Starting Location:
+	private IntPoint startingLocation;
+
 	// Goal:
 	private IntPoint goal;
 	private int goalRadius;
-	
+
 	// Obstacles:
 	private final List<Renderable> obstacles; // All of the obstacles on the map
 	private List<IntPoint> visibleObstacles;
-	
+
 	// Sample:
 	private int sampleSize;
 	private final int sampleSizeDefault;
@@ -44,12 +47,12 @@ public class PotentialFieldsRobot {
 	private MyArc firstArc;
 	private MyArc secondArc;
 	private MyArc thirdArc;
-		
+
 	//private Vector lastMove;
 
 //	private final int vistedScorePower;
 //	private final int goalScoreFactor;
-//	private final int visitedBoxSize;
+	private final int visitedBoxSize;
 
 	private boolean fractionalProgress;
 
@@ -57,6 +60,7 @@ public class PotentialFieldsRobot {
 	private final int VISITED_HISTOGRAM_HEIGHT;
 
 	private final int[][] visitedHistogram;
+	private boolean winding = false; //TODO
 
 
 	//-------------//
@@ -91,6 +95,8 @@ public class PotentialFieldsRobot {
 			robotPic = new RenderableImg("images" + File.separator + imagePath, startingLocation.x, startingLocation.y, radius * 2, radius * 2);
 		}
 
+		this.startingLocation = startingLocation;
+
 		this.coords = new IntPoint(startingLocation.x, startingLocation.y);
         heading = headingR;
 
@@ -114,6 +120,8 @@ public class PotentialFieldsRobot {
 
 		VISITED_HISTOGRAM_LENGTH = totalX / box;
 		VISITED_HISTOGRAM_HEIGHT = totalY / box;
+		
+		visitedBoxSize = box;
 
 		this.visitedHistogram = new int[VISITED_HISTOGRAM_LENGTH][VISITED_HISTOGRAM_HEIGHT];
 	}
@@ -142,7 +150,6 @@ public class PotentialFieldsRobot {
 		Vector robotPos = new Vector(coords.x, coords.y);
 		Vector samplePos = new Vector(moveTo.x, moveTo.y);
 
-		//TODO use visited histogram to set winding/unwinding
 
 		double theta = Calculator.getTheta(heading, robotPos, samplePos);
 
@@ -188,7 +195,7 @@ public class PotentialFieldsRobot {
 
 		// Calculate chords and arcs lengths:
 		double secondChordLength = segmentFromSampleToGoal.getMagnitude() * Math.sin(0.5 * absBeta) / Math.sin(absGamma);
-   
+
 	    if (absAlpha == 0 || absBeta == 0) {
 	    	secondChordLength  =    goalPos.diff(samplePos).getMagnitude()/2.0;   
 	    }
@@ -349,33 +356,87 @@ public class PotentialFieldsRobot {
 		}
 
 		// An array to store the values of p/(p+f)
-		double[] moveValues1 = new double[moves.size()];
+		double[] moveValues = new double[moves.size()];
 
-		// An array to store the values of f/(p+f)
-		double[] moveValues2 = new double[moves.size()];
+		// An array to store the obstacle potentials
+		double[] obstaclePotentials = new double[moves.size()];
 
+		iterateMovePointsToEvaluate(moves, moveValues, obstaclePotentials);
+
+		int minIndex = minIndex(moveValues);
+
+		int minIndexOfObstacle = minIndex(obstaclePotentials);
+		int maxIndexOfObstacle = maxIndex(obstaclePotentials);
+
+		//check if the robot is in the winding mode
+		if (winding) {
+			moves.remove(maxIndexOfObstacle);
+
+			double[] newMoveVals = new double[moves.size()];
+
+			double[] newObstaclePotentials = new double[moves.size()];
+
+			iterateMovePointsToEvaluate(moves, newMoveVals, newObstaclePotentials);
+
+			minIndexOfObstacle = minIndex(newObstaclePotentials);
+
+			if (minIndexOfObstacle == maxIndex(newMoveVals)) {
+				System.out.println("hey!");
+				winding = false;
+			}
+
+			return moves.get(minIndexOfObstacle);
+
+		} else if (minIndex == maxIndexOfObstacle) {
+			System.out.println("hello");
+			winding = true;
+			return moves.get(minIndexOfObstacle);
+		}
+
+		return moves.get(minIndex);
+	}
+
+
+	private int getIndexOfNextBestSamplePoint(double[] arr, double cur, int indexOfBiggest) {
+		double val = arr[indexOfBiggest];
+		int index = indexOfBiggest;
+
+		for (int i = 0; i < arr.length; i++) {
+			if (arr[i] > cur && arr[i] < val) {
+				val = arr[i];
+			}
+		}
+
+		return index;
+	}
+
+	/**
+	 * TODO
+	 * @param moves
+	 * @param moveValues
+	 * @param obstaclePotentials
+	 */
+	private void iterateMovePointsToEvaluate(List<IntPoint> moves, double[] moveValues, double[] obstaclePotentials) {
 		// use for loop to get all IntPoint instances from the list.
 		for (int i = 0; i < moves.size(); i++) {
 			IntPoint samplePoint = moves.get(i);
 
 			ArcSet set = get3Arcs(samplePoint, false);
+			
+			//get the obstacle potential of the sample point
+			double obstaclePotential = getObstaclePotential(samplePoint);
+			obstaclePotentials[i] = obstaclePotential;
 
 			// p = the length of the first arc to the sample point
 			double p = set.firstArc.arcLength;
 
 			// f = total length of 3 arcs + obstacle potential
-			double f = set.getTotalLengthOfArcs() + getObstaclePotential(samplePoint);
+			double f = set.getTotalLengthOfArcs() + obstaclePotential;
 
 			double sum = p + f;
 
-			moveValues1[i] = p / (sum);
-			moveValues2[i] = f / (sum);
+			moveValues[i] = f / (sum);
 		}
-
-		int minIndex = minIndex(moveValues2);
-		int maxIndex = maxIndex(moveValues1);
-
-		return moves.get(minIndex);
 	}
 	
 	//TODO -------------------------------------------------------------------------------- 

@@ -628,7 +628,7 @@ public class PotentialFields {
 
         // get and set the box size for the visited histogram
         if (boxes.isEmpty()) {
-        	box = 500; //TODO check if the value is suitable
+        	box = 50; //TODO check if the value is suitable
         	gui.setTextFieldContent(boxId, "" + box);
         } else {
         	box = Integer.parseInt(boxes);
@@ -672,7 +672,7 @@ public class PotentialFields {
 
 		//TODO arguments!!
 
-		// Disable all buttons while robot is active TODO
+		// Disable all buttons while robot is active
 		setButtons(false);
 		stop = false;
 
@@ -758,7 +758,7 @@ public class PotentialFields {
 
 			// Print current goal path smoothness
 			gui.unDraw(rs2);
-			//l += rob.getStepSize();TODO
+			//l += rob.getStepSize(); TODO
 			rs2 = new RenderableString(820, 0, "Path Smoothness Rating: " + (calculateSmoothness(path)));
 			rs2.setLayer(456);
 			rs2.setProperties(Color.BLUE, new Font(Font.SERIF, Font.BOLD, 14));
@@ -782,9 +782,8 @@ public class PotentialFields {
 		if (arc != null) {
             RenderablePolyline polyline = arc.getRenderablePolyline(arcs);
 
-            //TODO
-//			addVectorToLine(arc.getStartPoint(), polyline);
-//			addVectorToLine(arc.getEndPoint(), polyline);
+			addVectorToLine(arc.getStartPoint(), polyline);
+			addVectorToLine(arc.getEndPoint(), polyline);
 			polyline.setProperties(c, 5f);
 			gui.draw(polyline);
 		}
