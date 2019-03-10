@@ -60,7 +60,7 @@ public class PotentialFieldsRobot {
 	private final int VISITED_HISTOGRAM_HEIGHT;
 
 	private final int[][] visitedHistogram;
-	private boolean winding = false; //TODO
+	private boolean avoid_C_Curve = false;
 
 
 	//-------------//
@@ -368,8 +368,8 @@ public class PotentialFieldsRobot {
 		int minIndexOfObstacle = minIndex(obstaclePotentials);
 		int maxIndexOfObstacle = maxIndex(obstaclePotentials);
 
-		//check if the robot is in the winding mode
-		if (winding) {
+		//check if the robot is faced with c curve
+		if (avoid_C_Curve) {
 			moves.remove(maxIndexOfObstacle);
 
 			double[] newMoveVals = new double[moves.size()];
@@ -380,16 +380,18 @@ public class PotentialFieldsRobot {
 
 			minIndexOfObstacle = minIndex(newObstaclePotentials);
 
+			// check if the chosen sample point makes minimum fractional progress
 			if (minIndexOfObstacle == maxIndex(newMoveVals)) {
 				System.out.println("hey!");
-				winding = false;
+				avoid_C_Curve = false;
 			}
 
 			return moves.get(minIndexOfObstacle);
 
-		} else if (minIndex == maxIndexOfObstacle) {
+		} else if (minIndex == maxIndexOfObstacle) { // test the selected point's obstacle potential
 			System.out.println("hello");
-			winding = true;
+			// if the selected point is not viable, change the mode to winding mode
+			avoid_C_Curve = true;
 			return moves.get(minIndexOfObstacle);
 		}
 
@@ -474,10 +476,13 @@ public class PotentialFieldsRobot {
 	 * 
 	 * @param newHeading
 	 *            The heading to move along.
-	 **/
+	 */
 	private void moveTowards(double newHeading) {
+		//TODO a new line to be added to update the winding after each move.
+
 		double deltaX = stepSize * Math.cos(newHeading);
 		double deltaY = stepSize * Math.sin(newHeading);
+
 		coords.x += (int) deltaX;
 		coords.y += (int) deltaY;
                 
