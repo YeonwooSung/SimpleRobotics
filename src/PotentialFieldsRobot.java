@@ -347,7 +347,7 @@ public class PotentialFieldsRobot {
 
 	//TODO --------------------------------------------------------------------------------
 
-	private IntPoint evaluateSamplePointsArcForFractionalProgress() {
+	private IntPoint evaluateSamplePointsArcForFractionalProgress2() {
 		List<IntPoint> moves = getSamplePoints();
 
 		// If there's no moves that doesn't go through obstacles, quit
@@ -355,11 +355,13 @@ public class PotentialFieldsRobot {
 			return null;
 		}
 
+		int size = moves.size();
+
 		// An array to store the values of p/(p+f)
-		double[] moveValues = new double[moves.size()];
+		double[] moveValues = new double[size];
 
 		// An array to store the obstacle potentials
-		double[] obstaclePotentials = new double[moves.size()];
+		double[] obstaclePotentials = new double[size];
 
 		iterateMovePointsToEvaluate(moves, moveValues, obstaclePotentials);
 
@@ -384,6 +386,7 @@ public class PotentialFieldsRobot {
 			if (minIndexOfObstacle == maxIndex(newMoveVals)) {
 				System.out.println("hey!");
 				avoid_C_Curve = false;
+				return moves.get(minIndex);
 			}
 
 			return moves.get(minIndexOfObstacle);
@@ -399,21 +402,55 @@ public class PotentialFieldsRobot {
 	}
 
 
-	private int getIndexOfNextBestSamplePoint(double[] arr, double cur, int indexOfBiggest) {
-		double val = arr[indexOfBiggest];
-		int index = indexOfBiggest;
+	private IntPoint evaluateSamplePointsArcForFractionalProgress() {
+		List<IntPoint> moves = getSamplePoints();
 
-		for (int i = 0; i < arr.length; i++) {
-			if (arr[i] > cur && arr[i] < val) {
-				val = arr[i];
-			}
+		// If there's no moves that doesn't go through obstacles, quit
+		if (moves.isEmpty()) {
+			return null;
 		}
 
-		return index;
+		int size = moves.size();
+
+		// An array to store the values of f/(p+f)
+		double[] moveValues = new double[size];
+
+		// An array to store obstacle potentials
+		double[] obstaclePotentials = new double[size];
+
+		//TODO how to know if the point is viable??
+
+		//TODO sort the list, and iterate the list to check points one by one
+
+		// iterate the list of sample points
+		iterateMovePointsToEvaluate(moves, moveValues, obstaclePotentials);
+
+		//TODO
+		double[] totalPotential = new double[size];
+
+		for (int i = 0; i < size; i++) {
+			totalPotential[i] = moveValues[i] + obstaclePotentials[i];
+		}
+
+		int minIndex = minIndex(moveValues);
+		int maxIndex = maxIndex(obstaclePotentials);
+
+		if (avoid_C_Curve) {
+			int index = minIndex(totalPotential);
+			return moves.get(index);
+		} else if (minIndex == maxIndex) {
+			System.out.println("hello");
+			avoid_C_Curve = !avoid_C_Curve;
+			return moves.get(minIndex(totalPotential));
+		}
+
+		return moves.get(minIndex);
 	}
 
+
 	/**
-	 * TODO
+	 * Iterate the list of move points to fill the double type arrays with suitable values.
+	 *
 	 * @param moves
 	 * @param moveValues
 	 * @param obstaclePotentials
@@ -455,7 +492,7 @@ public class PotentialFieldsRobot {
 			return false;
 
 
-		IntPoint makeMove = evaluateMovePoints(moveTo); // Find the best move point using current sample as goal TODO: what if another sample point could be used and fail with this one?
+		IntPoint makeMove = evaluateMovePoints(moveTo); // Find the best move point using current sample as goal
 
 		if (makeMove == null)
 			return false;
