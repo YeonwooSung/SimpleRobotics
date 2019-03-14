@@ -450,6 +450,7 @@ public class PotentialFieldsRobot {
             ArrayList<IntPoint> unwinds = new ArrayList<>();
             ArrayList<IntPoint> winds = new ArrayList<>();
 
+            // use for loop to add points to the list of winding points and unwinding points.
             for (IntPoint move : moves) {
                 if (getObstaclePotential(move) < threshold) {
                 	if ((distance(move, goal) + radius) < distance(hitPoint, goal)) {
@@ -466,27 +467,31 @@ public class PotentialFieldsRobot {
 
                 double[] unwindValues = new double[unwinds.size()];
 
+                // iterate the unwind list to get obstacle potential of all unwind points
                 for (int i = 0; i < unwinds.size(); i++) {
 
                     unwindValues[i] = getObstaclePotential(unwinds.get(i));
 
                 }
 
+                //get the unwind point with the minimal obstacle potential
                 preferredMovePoint = unwinds.get(minIndex(unwindValues));
 
             } else if (winds.size() > 0) { //if there are no viable unwinding points, the robot should select a winding point that maximises obstacle potential
 
                 double[] windValues = new double[winds.size()];
 
+                // iterate the wind list to get obstacle potential of all winding points
                 for (int i = 0; i < winds.size(); i++) {
 
                     windValues[i] = getObstaclePotential(winds.get(i));
 
                 }
 
+                //get the wind point with the minimal obstacle potential
                 preferredMovePoint = winds.get(maxIndex(windValues));
 
-            } else { //as a last resort, just select the move with the highest FP
+            } else { //as a last resort, just select the move with the highest fractional progress
             	preferredMovePoint = moves.get(minIndex(moveValues));
             }
 
@@ -501,10 +506,16 @@ public class PotentialFieldsRobot {
 	}
 
 
-	//Actually performs the evaluation for each point passed
+	/**
+	 * The main aim of this method is to make a fractional progress by calculate (f/(f+p)).
+	 * This method actually performs the evaluation for each point passed.
+	 *
+	 * @param p the point that should be checked.
+	 * @return the value of fractional progress
+	 */
     private double makeFractionalProgress(IntPoint p) {
 
-        double fractionalProgress = 0;
+        double fp = 0;
 
         ArcSet arcs = get3Arcs(p, false);
 
@@ -513,37 +524,12 @@ public class PotentialFieldsRobot {
         double obsPotential = getObstaclePotential(p);
 
         double pastCost = arcs.firstArc.arcLength / 100;
-        double estFutureCost = (arcs.secondArc.arcLength + arcs.thirdArc.arcLength + obsPotential) / 100;
+        double futureCost = (arcs.secondArc.arcLength + arcs.thirdArc.arcLength + obsPotential) / 100;
 
-        fractionalProgress = estFutureCost / (estFutureCost + pastCost);
+        fp = futureCost / (futureCost + pastCost);
 
-
-        return fractionalProgress;
+        return fp;
     }
-
-	/**
-	 * Evaluate all of the robot's potential movement positions & return the best.
-	 * 
-	 * @return The most valuable point
-	 */
-	private IntPoint evaluateMovePoints_Arcs(IntPoint goal) {
-		List<IntPoint> moves = getMoveablePoints();
-
-		// If there's no moves that don't go through obstacles, quit
-		if (moves.isEmpty()) {
-			return null;
-		}
-
-
-		// Value of moves is a function of distance from goal & distance from detected objects
-		double[] moveValues = new double[moves.size()];
-
-		for (int i = 0; i < moves.size(); i++) {
-			moveValues[i] = evalMove(moves.get(i), goal);
-		}
-
-		return moves.get(minIndex(moveValues)); // Return the lowest valued move
-	}
 
 
 	/**

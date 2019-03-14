@@ -8,7 +8,7 @@ public class Robot {
 	 */
 	public Robot() {
 		gui = new EasyGui(100,100);
-		
+
 		gui.addLabel(0, 0, "Select an algorithm: ");
 
 		gui.addButton(1, 0, "RRT", this, "rrt");
