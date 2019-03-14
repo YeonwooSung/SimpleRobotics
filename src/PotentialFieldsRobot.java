@@ -62,6 +62,11 @@ public class PotentialFieldsRobot {
 	private final int[][] visitedHistogram;
 	private boolean avoid_C_Curve = false;
 
+	private IntPoint hitPoint; //Position of robot when BugMode started
+
+	//If the preferred move brings the robot too close to an obstacle, Bug Mode is activated
+	private boolean bugModeRobot = false;
+
 
 	//-------------//
 	// Constructor //
@@ -392,7 +397,6 @@ public class PotentialFieldsRobot {
 			return moves.get(minIndexOfObstacle);
 
 		} else if (minIndex == maxIndexOfObstacle) { // test the selected point's obstacle potential
-			System.out.println("hello");
 			// if the selected point is not viable, change the mode to winding mode
 			avoid_C_Curve = true;
 			return moves.get(minIndexOfObstacle);
@@ -402,49 +406,143 @@ public class PotentialFieldsRobot {
 	}
 
 
+	/**
+	 * This method evaluates each possible sample point based on the fractional progress.
+	 *
+	 * For example, selects the point with the lowest fractional progress = f/(p+f) 
+	 * where p is past cost and f is estimated future cost.
+	 * @return
+	 */
 	private IntPoint evaluateSamplePointsArcForFractionalProgress() {
-		List<IntPoint> moves = getSamplePoints();
+		int threshold = (int) (radius * 1.5);
 
-		// If there's no moves that doesn't go through obstacles, quit
+        double remainingDistanceToGoal = distance(coords, goal);
+
+        List<IntPoint> moves = getSamplePoints();
+
+        // If there's no move that doesn't go through an obstacle, return null to quit
+        if (moves.isEmpty()) {
+            return null;
+        }
+
+
+        //update current distance from the nearest obstacle
+
+        double[] moveValues = new double[moves.size()];
+
+        for (int i = 0; i < moves.size(); i++) {
+            moveValues[i] = makeFractionalProgress(moves.get(i));
+        }
+
+        IntPoint preferredMovePoint = new IntPoint();
+
+        if (!bugModeRobot) {
+        	preferredMovePoint = moves.get(minIndex(moveValues));
+
+            if (getObstaclePotential(coords) > threshold) {
+            	bugModeRobot = true;
+                hitPoint = new IntPoint(coords.x, coords.y);
+            }
+
+        } else {
+            //if the robot is in bug mode it searches through it's available moves to see if any are viable unwinds (ie, have an OP lower than the threshold and a lower FP than the current position) and if so, selects the one with the lowest fractional progress
+
+            ArrayList<IntPoint> unwinds = new ArrayList<>();
+            ArrayList<IntPoint> winds = new ArrayList<>();
+
+            for (IntPoint move : moves) {
+                if (getObstaclePotential(move) < threshold) {
+                	if ((distance(move, goal) + radius) < distance(hitPoint, goal)) {
+                		unwinds.add(move);
+                	} else {
+                		winds.add(move);
+                	}
+                }
+            }
+
+
+            // check the size of unwind list to select the best unwind point
+            if (unwinds.size() > 0) {
+
+                double[] unwindValues = new double[unwinds.size()];
+
+                for (int i = 0; i < unwinds.size(); i++) {
+
+                    unwindValues[i] = getObstaclePotential(unwinds.get(i));
+
+                }
+
+                preferredMovePoint = unwinds.get(minIndex(unwindValues));
+
+            } else if (winds.size() > 0) { //if there are no viable unwinding points, the robot should select a winding point that maximises obstacle potential
+
+                double[] windValues = new double[winds.size()];
+
+                for (int i = 0; i < winds.size(); i++) {
+
+                    windValues[i] = getObstaclePotential(winds.get(i));
+
+                }
+
+                preferredMovePoint = winds.get(maxIndex(windValues));
+
+            } else { //as a last resort, just select the move with the highest FP
+            	preferredMovePoint = moves.get(minIndex(moveValues));
+            }
+
+            if (getObstaclePotential(coords) < threshold / 4) {
+            	bugModeRobot = false;
+                hitPoint = coords;
+            }
+        }
+
+
+        return preferredMovePoint;
+	}
+
+
+	//Actually performs the evaluation for each point passed
+    private double makeFractionalProgress(IntPoint p) {
+
+        double fractionalProgress = 0;
+
+        ArcSet arcs = get3Arcs(p, false);
+
+        //obstacle potential is calculated by measuring the distance from all obstacles to the candidate point and summing them
+
+        double obsPotential = getObstaclePotential(p);
+
+        double pastCost = arcs.firstArc.arcLength / 100;
+        double estFutureCost = (arcs.secondArc.arcLength + arcs.thirdArc.arcLength + obsPotential) / 100;
+
+        fractionalProgress = estFutureCost / (estFutureCost + pastCost);
+
+
+        return fractionalProgress;
+    }
+
+	/**
+	 * Evaluate all of the robot's potential movement positions & return the best.
+	 * 
+	 * @return The most valuable point
+	 */
+	private IntPoint evaluateMovePoints_Arcs(IntPoint goal) {
+		List<IntPoint> moves = getMoveablePoints();
+
+		// If there's no moves that don't go through obstacles, quit
 		if (moves.isEmpty()) {
 			return null;
 		}
 
-		int size = moves.size();
 
-		// An array to store the values of f/(p+f)
-		double[] moveValues = new double[size];
+		// Value of moves is a function of distance from goal & distance from detected objects
+		double[] moveValues = new double[moves.size()];
 
-		// An array to store obstacle potentials
-		double[] obstaclePotentials = new double[size];
-
-		//TODO how to know if the point is viable??
-
-		//TODO sort the list, and iterate the list to check points one by one
-
-		// iterate the list of sample points
-		iterateMovePointsToEvaluate(moves, moveValues, obstaclePotentials);
-
-		//TODO
-		double[] totalPotential = new double[size];
-
-		for (int i = 0; i < size; i++) {
-			totalPotential[i] = moveValues[i] + obstaclePotentials[i];
+		for (int i = 0; i < moves.size(); i++) {
+			moveValues[i] = evalMove(moves.get(i), goal);
 		}
 
-		int minIndex = minIndex(moveValues);
-		int maxIndex = maxIndex(obstaclePotentials);
-
-		if (avoid_C_Curve) {
-			int index = minIndex(totalPotential);
-			return moves.get(index);
-		} else if (minIndex == maxIndex) {
-			System.out.println("hello");
-			avoid_C_Curve = !avoid_C_Curve;
-			return moves.get(minIndex(totalPotential));
-		}
-
-		return moves.get(minIndex);
+		return moves.get(minIndex(moveValues)); // Return the lowest valued move
 	}
 
 
@@ -690,9 +788,10 @@ public class PotentialFieldsRobot {
 
 
 	/**
-	 * Get a list of all the sample points evenly distributed in a 180-degree arc in
-	 * front of the robot
-	 **/
+	 * Get a list of all the sample points evenly distributed in a 180-degree arc in front of the robot.
+	 *
+	 * @return the list of sample points.
+	 */
 	public List<IntPoint> getSamplePoints() {
 		List<IntPoint> moveablePoints = new ArrayList<IntPoint>(sensorDensity);
 
@@ -1052,14 +1151,26 @@ public class PotentialFieldsRobot {
 		}
 	}
 
-	public MyArc getFirstArc() { //TODO: null pointer exception moving between plannars halway
+	/**
+	 * Getter for the first arc.
+	 * @return The firstArc instance.
+	 */
+	public MyArc getFirstArc() {
 		return firstArc;
 	}
 
+	/**
+	 * Getter for the second arc.
+	 * @return The secondArc instance.
+	 */
 	public MyArc getSecondArc() {
 		return secondArc;
 	}
-	
+
+	/**
+	 * Getter for the third arc.
+	 * @return The thirdArc instance.
+	 */
 	public MyArc getThirdArc() {
 		return thirdArc;
 	}
@@ -1083,11 +1194,11 @@ public class PotentialFieldsRobot {
 			return firstArc.arcLength + secondArc.arcLength + thirdArc.arcLength;
 		}
 	}
-        
+
     public void setGoal(IntPoint newGoal) {
 		this.goal = newGoal;
 	}
-	
+
 	public void setGoalRadius(int rad) {
 		this.goalRadius = rad;
 	}
