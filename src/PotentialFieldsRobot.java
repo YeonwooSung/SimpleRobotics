@@ -62,10 +62,12 @@ public class PotentialFieldsRobot {
 	private final int[][] visitedHistogram;
 	private boolean avoid_C_Curve = false;
 
-	private IntPoint hitPoint; //Position of robot when BugMode started
+	private IntPoint startBugPosition; //Position of robot when BugMode started
 
 	//If the preferred move brings the robot too close to an obstacle, Bug Mode is activated
 	private boolean bugModeRobot = false;
+	
+	private int threshold;
 
 
 	//-------------//
@@ -129,6 +131,8 @@ public class PotentialFieldsRobot {
 		visitedBoxSize = box;
 
 		this.visitedHistogram = new int[VISITED_HISTOGRAM_LENGTH][VISITED_HISTOGRAM_HEIGHT];
+
+		threshold = (int) (radius * 1.5);
 	}
 
 
@@ -414,11 +418,7 @@ public class PotentialFieldsRobot {
 	 * @return
 	 */
 	private IntPoint evaluateSamplePointsArcForFractionalProgress() {
-		int threshold = (int) (radius * 1.5);
-
-        double remainingDistanceToGoal = distance(coords, goal);
-
-        List<IntPoint> moves = getSamplePoints();
+		List<IntPoint> moves = getSamplePoints();
 
         // If there's no move that doesn't go through an obstacle, return null to quit
         if (moves.isEmpty()) {
@@ -441,7 +441,7 @@ public class PotentialFieldsRobot {
 
             if (getObstaclePotential(coords) > threshold) {
             	bugModeRobot = true;
-                hitPoint = new IntPoint(coords.x, coords.y);
+            	startBugPosition = new IntPoint(coords.x, coords.y);
             }
 
         } else {
@@ -453,7 +453,7 @@ public class PotentialFieldsRobot {
             // use for loop to add points to the list of winding points and unwinding points.
             for (IntPoint move : moves) {
                 if (getObstaclePotential(move) < threshold) {
-                	if ((distance(move, goal) + radius) < distance(hitPoint, goal)) {
+                	if ((distance(move, goal) + radius) < distance(startBugPosition, goal)) {
                 		unwinds.add(move);
                 	} else {
                 		winds.add(move);
@@ -497,7 +497,7 @@ public class PotentialFieldsRobot {
 
             if (getObstaclePotential(coords) < threshold / 4) {
             	bugModeRobot = false;
-                hitPoint = coords;
+            	startBugPosition = coords;
             }
         }
 
@@ -561,7 +561,7 @@ public class PotentialFieldsRobot {
 			moveValues[i] = f / (sum);
 		}
 	}
-	
+
 	//TODO -------------------------------------------------------------------------------- 
 
 
