@@ -3,13 +3,14 @@
     <!--this file was created by Eclipse Runnable JAR Export Wizard-->
     <!--ANT 1.7 is required                                        -->
     <target name="create_run_jar">
-        <jar destfile="/Users/CY/Documents/Robot.jar" filesetmanifest="mergewithoutmain">
+        <jar destfile="./Robot.jar" filesetmanifest="mergewithoutmain">
             <manifest>
                 <attribute name="Main-Class" value="Robot"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
-            <fileset dir="/Users/CY/Documents/JavaWorkSpace/SimpleRobotics/bin"/>
-            <zipfileset excludes="META-INF/*.SF" src="/Users/CY/Documents/JavaWorkSpace/SimpleRobotics/src/robot.jar"/>
+            <fileset dir="./bin"/>
+            <fileset dir="./src"/>
+	    <zipgroupfileset dir="./src" includes="**/ToolBox.jar" />
         </jar>
     </target>
 </project>
