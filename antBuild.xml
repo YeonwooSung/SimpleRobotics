@@ -8,9 +8,9 @@
                 <attribute name="Main-Class" value="Robot"/>
                 <attribute name="Class-Path" value="."/>
             </manifest>
-            <fileset dir="/Users/CY/Documents/JavaWorkSpace/SimpleRobotics/bin"/>
-            <fileset dir="/Users/CY/Documents/JavaWorkSpace/SimpleRobotics/src"/>
-            <zipfileset excludes="META-INF/*.SF" src="/Users/CY/Documents/JavaWorkSpace/SimpleRobotics/src/robot.jar"/>
+            <fileset dir="/Users/CY/Desktop/SimpleRobotics/bin"/>
+            <fileset dir="/Users/CY/Desktop/SimpleRobotics/src"/>
+            <zipfileset excludes="META-INF/*.SF" src="/Users/CY/Desktop/SimpleRobotics/src/robot.jar"/>
         </jar>
     </target>
 </project>

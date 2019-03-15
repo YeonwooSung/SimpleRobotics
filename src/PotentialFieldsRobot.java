@@ -24,9 +24,6 @@ public class PotentialFieldsRobot {
 	private final int sensorRange; // Range of sensors
 	private final int sensorDensity; // Number of 'lines' the robot uses to see
 
-	// Starting Location:
-	private IntPoint startingLocation;
-
 	// Goal:
 	private IntPoint goal;
 	private int goalRadius;
@@ -60,13 +57,13 @@ public class PotentialFieldsRobot {
 	private final int VISITED_HISTOGRAM_HEIGHT;
 
 	private final int[][] visitedHistogram;
-	private boolean avoid_C_Curve = false;
 
 	private IntPoint startBugPosition; //Position of robot when BugMode started
 
 	//If the preferred move brings the robot too close to an obstacle, Bug Mode is activated
 	private boolean bugModeRobot = false;
-	
+
+	//The threshold that is used for the obstacle navigation
 	private int threshold;
 
 
@@ -101,8 +98,6 @@ public class PotentialFieldsRobot {
 
 			robotPic = new RenderableImg("images" + File.separator + imagePath, startingLocation.x, startingLocation.y, radius * 2, radius * 2);
 		}
-
-		this.startingLocation = startingLocation;
 
 		this.coords = new IntPoint(startingLocation.x, startingLocation.y);
         heading = headingR;
@@ -354,62 +349,6 @@ public class PotentialFieldsRobot {
 	}
 
 
-	//TODO --------------------------------------------------------------------------------
-
-	private IntPoint evaluateSamplePointsArcForFractionalProgress2() {
-		List<IntPoint> moves = getSamplePoints();
-
-		// If there's no moves that doesn't go through obstacles, quit
-		if (moves.isEmpty()) {
-			return null;
-		}
-
-		int size = moves.size();
-
-		// An array to store the values of p/(p+f)
-		double[] moveValues = new double[size];
-
-		// An array to store the obstacle potentials
-		double[] obstaclePotentials = new double[size];
-
-		iterateMovePointsToEvaluate(moves, moveValues, obstaclePotentials);
-
-		int minIndex = minIndex(moveValues);
-
-		int minIndexOfObstacle = minIndex(obstaclePotentials);
-		int maxIndexOfObstacle = maxIndex(obstaclePotentials);
-
-		//check if the robot is faced with c curve
-		if (avoid_C_Curve) {
-			moves.remove(maxIndexOfObstacle);
-
-			double[] newMoveVals = new double[moves.size()];
-
-			double[] newObstaclePotentials = new double[moves.size()];
-
-			iterateMovePointsToEvaluate(moves, newMoveVals, newObstaclePotentials);
-
-			minIndexOfObstacle = minIndex(newObstaclePotentials);
-
-			// check if the chosen sample point makes minimum fractional progress
-			if (minIndexOfObstacle == maxIndex(newMoveVals)) {
-				System.out.println("hey!");
-				avoid_C_Curve = false;
-				return moves.get(minIndex);
-			}
-
-			return moves.get(minIndexOfObstacle);
-
-		} else if (minIndex == maxIndexOfObstacle) { // test the selected point's obstacle potential
-			// if the selected point is not viable, change the mode to winding mode
-			avoid_C_Curve = true;
-			return moves.get(minIndexOfObstacle);
-		}
-
-		return moves.get(minIndex);
-	}
-
-
 	/**
 	 * This method evaluates each possible sample point based on the fractional progress.
 	 *
@@ -430,6 +369,7 @@ public class PotentialFieldsRobot {
 
         double[] moveValues = new double[moves.size()];
 
+        // use for loop to get all move values from the array list of sample points
         for (int i = 0; i < moves.size(); i++) {
             moveValues[i] = makeFractionalProgress(moves.get(i));
         }
@@ -439,8 +379,11 @@ public class PotentialFieldsRobot {
         if (!bugModeRobot) {
         	preferredMovePoint = moves.get(minIndex(moveValues));
 
+        	// check if the obstacle potential of the current position is greater than the threshold
             if (getObstaclePotential(coords) > threshold) {
             	bugModeRobot = true;
+
+            	//startBugPosition is a position of robot when BugMode started
             	startBugPosition = new IntPoint(coords.x, coords.y);
             }
 
@@ -470,6 +413,7 @@ public class PotentialFieldsRobot {
                 // iterate the unwind list to get obstacle potential of all unwind points
                 for (int i = 0; i < unwinds.size(); i++) {
 
+                	//get the obstacle potentials of the unwind points
                     unwindValues[i] = getObstaclePotential(unwinds.get(i));
 
                 }
@@ -484,6 +428,7 @@ public class PotentialFieldsRobot {
                 // iterate the wind list to get obstacle potential of all winding points
                 for (int i = 0; i < winds.size(); i++) {
 
+                	//get obstacle potential of wind points
                     windValues[i] = getObstaclePotential(winds.get(i));
 
                 }
@@ -495,8 +440,11 @@ public class PotentialFieldsRobot {
             	preferredMovePoint = moves.get(minIndex(moveValues));
             }
 
+            //if the obstacle potential of the current coordinate is less than "threshold / 4", stop the bug mode.
             if (getObstaclePotential(coords) < threshold / 4) {
-            	bugModeRobot = false;
+            	bugModeRobot = false; //end the bug mode
+
+            	//store the position of robot when BugMode ended
             	startBugPosition = coords;
             }
         }
@@ -531,38 +479,6 @@ public class PotentialFieldsRobot {
         return fp;
     }
 
-
-	/**
-	 * Iterate the list of move points to fill the double type arrays with suitable values.
-	 *
-	 * @param moves
-	 * @param moveValues
-	 * @param obstaclePotentials
-	 */
-	private void iterateMovePointsToEvaluate(List<IntPoint> moves, double[] moveValues, double[] obstaclePotentials) {
-		// use for loop to get all IntPoint instances from the list.
-		for (int i = 0; i < moves.size(); i++) {
-			IntPoint samplePoint = moves.get(i);
-
-			ArcSet set = get3Arcs(samplePoint, false);
-			
-			//get the obstacle potential of the sample point
-			double obstaclePotential = getObstaclePotential(samplePoint);
-			obstaclePotentials[i] = obstaclePotential;
-
-			// p = the length of the first arc to the sample point
-			double p = set.firstArc.arcLength;
-
-			// f = total length of 3 arcs + obstacle potential
-			double f = set.getTotalLengthOfArcs() + obstaclePotential;
-
-			double sum = p + f;
-
-			moveValues[i] = f / (sum);
-		}
-	}
-
-	//TODO -------------------------------------------------------------------------------- 
 
 
 	/**
@@ -599,8 +515,6 @@ public class PotentialFieldsRobot {
 	 *            The heading to move along.
 	 */
 	private void moveTowards(double newHeading) {
-		//TODO a new line to be added to update the winding after each move.
-
 		double deltaX = stepSize * Math.cos(newHeading);
 		double deltaY = stepSize * Math.sin(newHeading);
 

@@ -1,2 +1,6 @@
 Manifest-Version: 1.0
+Rsrc-Class-Path: ./ ToolBox.jar
+Class-Path: .
+Rsrc-Main-Class: Robot
+Main-Class: org.eclipse.jdt.internal.jarinjarloader.JarRsrcLoader
 
